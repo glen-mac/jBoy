@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Scanner;
 
 public class Z80 {
 
@@ -11,10 +12,10 @@ public class Z80 {
 	private static final int REGISTER_H = 6;
 	private static final int REGISTER_L = 7;
 
-	private static final int FLAG_ZERO = 0x80;
-	private static final int FLAG_SUBTRACT = 0x40;
-	private static final int FLAG_HALFCARRY = 0x20;
-	private static final int FLAG_CARRY = 0x10;
+	public static final int FLAG_ZERO = 0x80;
+	public static final int FLAG_SUBTRACT = 0x40;
+	public static final int FLAG_HALFCARRY = 0x20;
+	public static final int FLAG_CARRY = 0x10;
 
 	private static final int CLOCKSPEED = 4194304; //Hz
 
@@ -57,12 +58,23 @@ public class Z80 {
 	}
 
 	public void playCartridge() {
+		Scanner sc = new Scanner(System.in);
+		boolean step = false;
 		while (!doReset) {
 			opCode = memory.readByte(pc++);
 			numCycles = execute(opCode);
 			updateTimers(numCycles);
 			graphics.step(numCycles);
 			checkInterupts();
+			if (pc ==0x6A)
+				step =true;
+			if (step)
+				while (!(sc.nextLine().trim().isEmpty()))
+
+				//for (int i = 0; i<100; i++)
+					//System.out.println("############################################################################################3");
+
+			//}
 		}
 	}
 
@@ -98,6 +110,7 @@ public class Z80 {
 		if (divideCounter >= 255) { //freq is 16382 Hz
 			divideCounter = 0;
 			memory.portsIO[DIVIDE_REG - 0xFF00]++;
+			System.out.println("dividecounter = " + divideCounter);
 		}
 	}
 
@@ -105,6 +118,7 @@ public class Z80 {
 		updateDivideRegister(cycles);
 		if (isClockEnabled()) {
 			timerCounter -= cycles;
+			System.out.println("timercounter = " + timerCounter);
 			if (timerCounter <= 0) {
 				setClockFreq();
 				if (memory.readByte(TIMER_REG) == 255) {
@@ -125,7 +139,9 @@ public class Z80 {
 		registers[REGISTER_H] = 0x01;
 		registers[REGISTER_L] = 0x4D;
 		sp = 0xFFFE;
-		pc = 0x0100;
+		pc = 0x0;
+		//0x0100;
+		memory.reset();
 	}
 
 	public void loadCartridge(String fileName) {
@@ -134,8 +150,14 @@ public class Z80 {
 			long fileSize = rom.length();
 			FileInputStream fis = new FileInputStream(rom);
 			memory.iniGB(fileSize);
-			fis.read(memory.catridgeROM);
+			//fis.read((byte[]) memory.catridgeROM);
+			int i = 0;
+			while (fis.available() > 0) {
+				memory.catridgeROM[i++] = (char) fis.read();
+			}
 			fis.close(); //close the file
+
+			System.out.println("finished cart");
 		} catch (FileNotFoundException ex) {
 			System.out.println("ERROR: File '" + fileName + "' not found!\n");
 			System.exit(0);
@@ -150,6 +172,8 @@ public class Z80 {
 
 	public void requestInterupt(int bitNum){
 		memory.writeByte(INTERUPT_REQUEST_REG, bitSet(memory.readByte(INTERUPT_REQUEST_REG), bitNum));
+		System.out.println("INTERRUPT " + bitNum);
+		//System.exit(1);
 	}
 
 	private void checkInterupts(){
@@ -209,8 +233,16 @@ public class Z80 {
 		return word & 0xFF;
 	}
 
-	public int execute(int opCode) {
+	static public char unsign(int b) {
+		if (b < 0) {
+			return (char) (256 + b);
+		} else {
+			return (char) b;
+		}
+	}
 
+	public int execute(int opCode) {
+		System.out.println("PC = 0x" + Integer.toHexString(pc - 1) + " | Performing OPCode 0x"+Integer.toHexString(opCode).toUpperCase());
 		int tempByte;
 
 		switch (opCode) {
@@ -646,34 +678,34 @@ public class Z80 {
 				}
 				case 0xF0:
 				{ //LDH A,(n)
-					registers[REGISTER_A] = 0xFF00 + memory.readByte(pc++);
+					registers[REGISTER_A] = memory.readByte(0xFF00 + memory.readByte(pc++));
 					return 12;
 				}
 				case 0x01:
 				{ //LD BC,nn
 					int data = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
-					load(REGISTER_B, REGISTER_C, data);
+					load(REGISTER_B, REGISTER_C, data & 0xFFFF);
 					pc += 2;
 					return 12;
 				}
 				case 0x11:
 				{ //LD DE,nn
 					int data = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
-					load(REGISTER_D, REGISTER_E, data);
+					load(REGISTER_D, REGISTER_E, data & 0xFFFF);
 					pc += 2;
 					return 12;
 				}
 				case 0x21:
 				{ //LD HL,nn
 					int data = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
-					load(REGISTER_H, REGISTER_L, data);
+					load(REGISTER_H, REGISTER_L, data & 0xFFFF);
 					pc += 2;
 					return 12;
 				}
 				case 0x31:
 				{ //LD SP,nn
 					int data = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
-					sp = data;
+					sp = data & 0xFFFF;
 					pc += 2;
 					return 12;
 				}
@@ -685,11 +717,11 @@ public class Z80 {
 				case 0xF8:
 				{ //LDHL SP,n
 					clearFlags();
-					tempByte = memory.readByte(pc++);
+					tempByte = (byte) memory.readByte(pc++);
 					int sum = sp + tempByte;
 					if (((sp & 0xFF) + (tempByte & 0xFF)) > 0xFF) setFlag(FLAG_HALFCARRY);
 					if (sum > 0xFFFF) setFlag(FLAG_CARRY);
-					checkZeroFlag(sum & 0xFFFF);
+					if ((sum & 0xFFFF)==0) setFlag(FLAG_ZERO);
 					load(REGISTER_H, REGISTER_L, sum & 0xFFFF);
 					return 12;
 				}
@@ -1254,7 +1286,7 @@ public class Z80 {
 				case 0xE8:
 				{ //ADD SP,#
 					clearFlags();
-					tempByte = memory.readByte(pc++);
+					tempByte = (byte) memory.readByte(pc++);
 					int sum = sp + tempByte;
 					if (((sp & 0xFF) + (tempByte & 0xFF)) > 0xFF) setFlag(FLAG_HALFCARRY);
 					if (sum > 0xFFFF) setFlag(FLAG_CARRY);
@@ -1303,6 +1335,7 @@ public class Z80 {
 				}
 				case 0xCB:
 				{ //SWAP n | RLC n | RL n
+					System.out.println("PC = 0x" + Integer.toHexString(pc) + " | Performing Sub-OPCode 0x"+Integer.toHexString(memory.readByte(pc)).toUpperCase());
 					switch (memory.readByte(pc++)) {
 						case 0x37:
 							{ //SWAP A
@@ -2837,17 +2870,20 @@ public class Z80 {
 		}
 
 		private void writeHL(int data) {
-			memory.writeByte(combine(REGISTER_H, REGISTER_L), data);
+			memory.writeByte(combine(REGISTER_H, REGISTER_L), data & 0xFFFF);
 		}
 
 		private void compare(int r1, int data) {
 			clearFlags();
 			setFlag(FLAG_SUBTRACT);
 
-			if (data > registers[r1]) setFlag(FLAG_CARRY);
-			else if (registers[r1] == data) setFlag(FLAG_ZERO);
+			if (data > registers[r1])
+				setFlag(FLAG_CARRY);
+			else if (registers[r1] == data)
+				setFlag(FLAG_ZERO);
 
-			if ((data & 0x0F) > (registers[r1] & 0x0F)) setFlag(FLAG_HALFCARRY);
+			if ((data & 0x0F) > (registers[r1] & 0x0F))
+				setFlag(FLAG_HALFCARRY);
 		}
 
 		private void checkZeroFlag(int r1) {
@@ -2860,7 +2896,7 @@ public class Z80 {
 		}
 
 		private void resetFlag(int flag) {
-			registers[REGISTER_F] &= (~ (flag)) & 0xFF;
+			registers[REGISTER_F] &= (~(flag)) & 0xFF;
 		}
 
 		private void invertFlag(int flag) {
@@ -2868,7 +2904,7 @@ public class Z80 {
 			else setFlag(flag);
 		}
 
-		private int getFlag(int flag) {
+		public int getFlag(int flag) {
 			int flagVal = 0;
 			int flagReg = (registers[REGISTER_F] & flag);
 			switch (flag) {
@@ -2902,6 +2938,7 @@ public class Z80 {
 			int bit7 = registers[r1] >>> 7;
 			registers[r1] <<= 1;
 			registers[r1] |= bit7;
+			registers[r1] &= 0xFF;
 
 			checkZeroFlag(r1);
 
@@ -2914,6 +2951,7 @@ public class Z80 {
 			int bit7 = tempByte >>> 7;
 			tempByte <<= 1;
 			tempByte |= bit7;
+			tempByte &= 0xFFFF;
 
 			writeHL(tempByte);
 
@@ -2924,9 +2962,10 @@ public class Z80 {
 
 		private void rotateLeftCarry(int r1) {
 			clearFlags();
-			int bit7 = registers[r1] >>> 7;
+			int bit7 = (registers[r1] >>> 7) & 0x1;
 			registers[r1] <<= 1;
 			registers[r1] |= getFlag(FLAG_CARRY);
+			registers[r1] &= 0xFF;
 
 			checkZeroFlag(r1);
 
@@ -2939,6 +2978,7 @@ public class Z80 {
 			int bit7 = tempByte >>> 7;
 			tempByte <<= 1;
 			tempByte |= getFlag(FLAG_CARRY);
+			tempByte &= 0xFFFF;
 
 			writeHL(tempByte);
 
@@ -2952,6 +2992,7 @@ public class Z80 {
 			int bit0 = registers[r1] & 0x1;
 			registers[r1] >>>= 1;
 			registers[r1] |= bit0 << 7;
+			registers[r1] &= 0xFF;
 
 			if (registers[r1] == 0) setFlag(FLAG_ZERO);
 
@@ -2963,6 +3004,7 @@ public class Z80 {
 			int bit0 = registers[r1] & 0x1;
 			registers[r1] >>>= 1;
 			registers[r1] |= getFlag(FLAG_CARRY) << 7;
+			registers[r1] &= 0xFF;
 
 			if (registers[r1] == 0) setFlag(FLAG_ZERO);
 
@@ -2975,6 +3017,7 @@ public class Z80 {
 			int bit0 = tempByte & 0x1;
 			tempByte >>>= 1;
 			tempByte |= bit0 << 7;
+			tempByte &= 0xFFFF;
 
 			writeHL(tempByte);
 
@@ -2989,6 +3032,7 @@ public class Z80 {
 			int bit0 = tempByte & 0x1;
 			tempByte >>>= 1;
 			tempByte |= getFlag(FLAG_CARRY) << 7;
+			tempByte &= 0xFFFF;
 
 			writeHL(tempByte);
 
@@ -3246,7 +3290,7 @@ public class Z80 {
 		}
 
 		private void jump() {
-			pc = combine(memory.readByte(pc + 1), memory.readByte(pc));
+			pc = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
 		}
 
 		private void jumpCC(String code) {
@@ -3270,32 +3314,43 @@ public class Z80 {
 			pc = combine(REGISTER_H, REGISTER_L);
 		}
 
-		private void jumpRel() {
-			pc += memory.readByte(pc);
+		private void jumpRel() { //address jumps confirmed working
+			int jumpPC = (byte) memory.readByte(pc);
+			pc += (jumpPC);
+			pc++; // need to jump forward because normal jump and call use a whole-byte argument
 		}
 
-		private void jumpRelCC(String code) {
+		private void jumpRelCC(String code) { //address jumps confirmed working
 			switch (code) {
 				case "NZ":
-				if (!(getFlag(FLAG_ZERO) == 1)) jumpRel();
-				break;
+				if (!(getFlag(FLAG_ZERO) == 1)) {
+					jumpRel();
+					return;
+				} break;
 				case "Z":
-				if (getFlag(FLAG_ZERO) == 1) jumpRel();
-				break;
+				if (getFlag(FLAG_ZERO) == 1) {
+					jumpRel();
+					return;
+				} break;
 				case "NC":
-				if (!(getFlag(FLAG_CARRY) == 1)) jumpRel();
-				break;
+				if (!(getFlag(FLAG_CARRY) == 1)) {
+					jumpRel();
+					return;
+				} break;
 				case "C":
-				if (getFlag(FLAG_CARRY) == 1) jumpRel();
-				break;
+				if (getFlag(FLAG_CARRY) == 1) {
+					jumpRel();
+					return;
+				} break;
 			}
+			pc++;
 		}
 
-		private void call() {
-			pc += 2;
-			push(pc >>> 8);
-			push(pc & 0xFF);
+		private void call() { //address jumps confirmed working
+			int oldPC = pc + 2; //another hack: RET returns to the desired pc + 2 for some reason..
 			jump();
+			push(oldPC >>> 8);
+			push(oldPC & 0xFF);
 		}
 
 		private void callCC(String code) {
@@ -3323,7 +3378,7 @@ public class Z80 {
 
 		private void returnOP() {
 			int lsb = pop();
-			pc = combine(pop(), lsb);
+			pc = (pop() << 8) | lsb;
 		}
 
 		private void returnOPCC(String code) {

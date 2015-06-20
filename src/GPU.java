@@ -42,11 +42,13 @@ public class GPU {
 	Bit 5: Mode 2 Interupt Enabled 
 	Bit 6: Coincidence Interupt Enabled */
 
-	private int mode;
+	private boolean second = false;
+
+	private int mode = 2;
 	private int modeClock;
 	private int line;
 	public int tileSet[][][] = new int[160][144][3];
-	private Z80 cpu;
+	public Z80 cpu;
 	private gbScreen screen;
 
 	public void step(int cycles) {
@@ -54,11 +56,16 @@ public class GPU {
 		int status = cpu.memory.readByte(LCD_STATUS);
 		boolean reqInt = false;
 
-		if (isLCDEnabled()) 
+		System.out.println("GPU MODE = " + mode);
+
+		if (isLCDEnabled()) {
 			modeClock += cycles;
+			System.out.println("LCD ENABLED");
+		}
 		else {
+			System.out.println("LCD DISABLED");
 			status = cpu.bitSet(status & 0xFC, 0); //1111 1101
-			mode = 1;
+			//mode = 1;
 			modeClock = 0;
 			line = 0;
 			cpu.memory.writeByte(SCANLINE_NUM, 0);
@@ -66,14 +73,21 @@ public class GPU {
 			return;
 		}
 
+			System.out.println("MODECLOCK = " + modeClock);
+			System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] + " (0x"+Integer.toHexString(cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]).toUpperCase()+")");
+			System.out.println("ZERO FLAG = " + cpu.getFlag(cpu.FLAG_ZERO));
+
 		switch (mode) {
+
 			case 0:
-				{ //Horizontal blank
+				 //Horizontal blank
 					if (modeClock >= 204) {
 						modeClock = 0;
-						cpu.memory.catridgeROM[SCANLINE_NUM]++;
-						line++;
-						if (line == 143) { //reached height
+						System.out.println("SCAN Before = " + cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
+						cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]++;
+						System.out.println("Scan After = " + cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
+						//line++;
+						if (cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] == 143) { //reached height
 							cpu.requestInterupt(0);
 
 							mode = 1; //begin vertical blank
@@ -89,35 +103,37 @@ public class GPU {
 							reqInt = cpu.bitTest(status, 5);
 						}
 					}
-					break;
-				}
+				break;
 				case 1:
-				{ //Vertical blank
+				//Vertical blank
+					//if (second == true)
+						
+
+
 					if (modeClock >= 456) {
 						modeClock = 0;
-						line++;
-						if (line == 153) { //Full frame (scans and vblank)
-							cpu.memory.catridgeROM[SCANLINE_NUM] = 0;
-							line = 0;
-
+						//line++;
+						cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]++;
+						System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
+						//System.exit(1);
+						if (cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] == 153) { //Full frame (scans and vblank)
+							cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] = 0;
 							mode = 2;
 							status = cpu.bitSet(status, 1);
 							status = cpu.bitReset(status, 0);
 							reqInt = cpu.bitTest(status, 5);
 						}
 					}
-					break;
-				}
+				break;
 				case 2:
-				{ //Scanline (accessing OAM)
+				//Scanline (accessing OAM)
 					if (modeClock >= 80) {
 						mode = 3;
 						modeClock = 0;
 					}
-					break;
-				}
+				break;
 				case 3:
-				{ //Scanline (accessing VRAM)
+				//Scanline (accessing VRAM)
 					if (modeClock >= 172) {
 
 						// Enter hblank
@@ -128,8 +144,7 @@ public class GPU {
 
 						modeClock = 0;
 					}
-					break;
-				}
+				break;
 			}
 
 			if (reqInt)
@@ -157,7 +172,7 @@ public class GPU {
 
 		public void renderScan(){
 			int control = cpu.memory.readByte(LCD_CONTR_REG);
-			//if (cpu.bitTest(control, 0))
+			if (cpu.bitTest(control, 0))
 				renderTiles();
 			if (cpu.bitTest(control, 1))
 				renderSprites();

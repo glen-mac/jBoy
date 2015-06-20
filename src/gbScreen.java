@@ -36,6 +36,8 @@ public class gbScreen extends JPanel{
 				int b = gpu.tileSet[x][y][2];
 				int col = (r << 16) | (g << 8) | b;
 				canvas.setRGB(x, y, col);
+				if (!(gpu.cpu.memory._inBIOS))
+					System.out.println("x="+x+" y="+y+" colour="+col);
 			}
 		}
 		repaint();
