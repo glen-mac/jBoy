@@ -48,6 +48,9 @@ public class Z80 {
 	int[] registers = new int[8]; // 8-bit registers
 	boolean doReset = false;
 
+	boolean halted;
+	boolean stopCounting;
+
 	int opCode;
 	int numCycles;
 
@@ -61,33 +64,36 @@ public class Z80 {
 		Scanner sc = new Scanner(System.in);
 		boolean step = false;
 		while (!doReset) {
-			opCode = memory.readByte(pc++);
-			numCycles = execute(opCode);
-			updateTimers(numCycles);
-			graphics.step(numCycles);
-			checkInterupts();
-			if (pc ==0x6A)
+			if (!halted){
+				opCode = memory.readByte(pc++);
+				numCycles = execute(opCode);
+				updateTimers(numCycles);
+				graphics.updateGraphics(numCycles);
+				checkInterupts();
+			/*if (pc ==0xE0)
 				step =true;
 			if (step)
-				while (!(sc.nextLine().trim().isEmpty()))
+			while (!(sc.nextLine().trim().isEmpty())){}*/
+
 
 				//for (int i = 0; i<100; i++)
 					//System.out.println("############################################################################################3");
 
 			//}
 		}
-	}
+}
+}
 
-	private boolean isClockEnabled() {
-		boolean result = false;
-		if (((memory.readByte(TIMER_CONTR) >>> 2) & 0x1) == 1) result = true;
-		return result;
-	}
+private boolean isClockEnabled() {
+	boolean result = false;
+	if (((memory.readByte(TIMER_CONTR) >>> 2) & 0x1) == 1) result = true;
+	return result;
+}
 
-	public void setClockFreq() {
-		switch (getClockFreq()) {
-			case 0:
-			timerCounter = 1024;
+public void setClockFreq() {
+	switch (getClockFreq()) {
+		case 0:
+		timerCounter = 1024;
 				break; // freq 4096
 				case 1:
 				timerCounter = 16;
@@ -110,7 +116,7 @@ public class Z80 {
 		if (divideCounter >= 255) { //freq is 16382 Hz
 			divideCounter = 0;
 			memory.portsIO[DIVIDE_REG - 0xFF00]++;
-			System.out.println("dividecounter = " + divideCounter);
+			//System.out.println("dividecounter = " + divideCounter);
 		}
 	}
 
@@ -118,7 +124,7 @@ public class Z80 {
 		updateDivideRegister(cycles);
 		if (isClockEnabled()) {
 			timerCounter -= cycles;
-			System.out.println("timercounter = " + timerCounter);
+			//System.out.println("timercounter = " + timerCounter);
 			if (timerCounter <= 0) {
 				setClockFreq();
 				if (memory.readByte(TIMER_REG) == 255) {
@@ -142,6 +148,38 @@ public class Z80 {
 		pc = 0x0;
 		//0x0100;
 		memory.reset();
+
+	memory.writeByte(0xFF05, 0x00); // TIMA
+      memory.writeByte(0xFF06, 0x00); // TMA
+      memory.writeByte(0xFF07, 0x00); // TAC
+      memory.writeByte(0xFF10, 0x80); // NR10
+      memory.writeByte(0xFF11, 0xBF); // NR11
+      memory.writeByte(0xFF12, 0xF3); // NR12
+      memory.writeByte(0xFF14, 0xBF); // NR14
+      memory.writeByte(0xFF16, 0x3F); // NR21
+      memory.writeByte(0xFF17, 0x00); // NR22
+      memory.writeByte(0xFF19, 0xBF); // NR24
+      memory.writeByte(0xFF1A, 0x7F); // NR30
+      memory.writeByte(0xFF1B, 0xFF); // NR31
+      memory.writeByte(0xFF1C, 0x9F); // NR32
+      memory.writeByte(0xFF1E, 0xBF); // NR33
+      memory.writeByte(0xFF20, 0xFF); // NR41
+      memory.writeByte(0xFF21, 0x00); // NR42
+      memory.writeByte(0xFF22, 0x00); // NR43
+      memory.writeByte(0xFF23, 0xBF); // NR30
+      memory.writeByte(0xFF24, 0x77); // NR50
+      memory.writeByte(0xFF25, 0xF3); // NR51
+      memory.writeByte(0xFF26, 0xF1); // NR52
+      memory.writeByte(0xFF40, 0x91); // LCDC
+      memory.writeByte(0xFF42, 0x00); // SCY
+      memory.writeByte(0xFF43, 0x00); // SCX
+      memory.writeByte(0xFF45, 0x00); // LYC
+      memory.writeByte(0xFF47, 0xFC); // BGP
+      memory.writeByte(0xFF48, 0xFF); // OBP0
+      memory.writeByte(0xFF49, 0xFF); // OBP1
+      memory.writeByte(0xFF4A, 0x00); // WY
+      memory.writeByte(0xFF4B, 0x00); // WX
+      memory.writeByte(0xFFFF, 0x00); // IE
 	}
 
 	public void loadCartridge(String fileName) {
@@ -157,7 +195,7 @@ public class Z80 {
 			}
 			fis.close(); //close the file
 
-			System.out.println("finished cart");
+			//System.out.println("finished cart");
 		} catch (FileNotFoundException ex) {
 			System.out.println("ERROR: File '" + fileName + "' not found!\n");
 			System.exit(0);
@@ -172,7 +210,7 @@ public class Z80 {
 
 	public void requestInterupt(int bitNum){
 		memory.writeByte(INTERUPT_REQUEST_REG, bitSet(memory.readByte(INTERUPT_REQUEST_REG), bitNum));
-		System.out.println("INTERRUPT " + bitNum);
+		//System.out.println("INTERRUPT " + bitNum);
 		//System.exit(1);
 	}
 
@@ -194,6 +232,7 @@ public class Z80 {
 		LCD: 0x48
 		TIMER: 0x50
 		JOYPAD: 0x60 */
+		halted = false;
 		interuptMasterEnable = false;
 		memory.writeByte(INTERUPT_REQUEST_REG, bitReset(memory.readByte(INTERUPT_REQUEST_REG), bitNum));
 
@@ -207,7 +246,7 @@ public class Z80 {
 			case 3: pc = 0x60; break;
 		}
 
-		System.out.println("Serving interrupt: " + bitNum);
+		//System.out.println("Serving interrupt: " + bitNum);
 	}
 
 	public static int bitSet(int num, int bit){
@@ -223,6 +262,10 @@ public class Z80 {
 		if (((num >>> bit) & 0x1) == 1)
 			result = true;
 		return result;
+	}
+
+	public static int bitGet(int num, int bit){
+		return ((num >>> bit) & 0x1);
 	}
 
 	public static int hiWord(int word){
@@ -242,12 +285,16 @@ public class Z80 {
 	}
 
 	public int execute(int opCode) {
-		System.out.println("PC = 0x" + Integer.toHexString(pc - 1) + " | Performing OPCode 0x"+Integer.toHexString(opCode).toUpperCase());
+		//System.out.println("PC = 0x" + Integer.toHexString(pc - 1) + " | Performing OPCode 0x"+Integer.toHexString(opCode).toUpperCase());
 		int tempByte;
 
 		switch (opCode) {
 			case 0x00:
 				{ //NOP					
+					return 4;
+				}
+				case 0xFD:
+				{ // no operation				
 					return 4;
 				}
 				case 0x3E:
@@ -711,7 +758,7 @@ public class Z80 {
 				}
 				case 0xF9:
 				{ //LD SP,HL
-					sp = readHL();
+					sp = combine(REGISTER_H, REGISTER_L);
 					return 8;
 				}
 				case 0xF8:
@@ -722,7 +769,7 @@ public class Z80 {
 					if (((sp & 0xFF) + (tempByte & 0xFF)) > 0xFF) setFlag(FLAG_HALFCARRY);
 					if (sum > 0xFFFF) setFlag(FLAG_CARRY);
 					if ((sum & 0xFFFF)==0) setFlag(FLAG_ZERO);
-					load(REGISTER_H, REGISTER_L, sum & 0xFFFF);
+					load(REGISTER_H, REGISTER_L, sum);
 					return 12;
 				}
 				case 0x08:
@@ -1310,7 +1357,7 @@ public class Z80 {
 				}
 				case 0x33:
 				{ //INC SP
-					sp++;
+					sp = (sp + 1) & 0xFFFF;
 					return 8;
 				}
 				case 0x0B:
@@ -1330,12 +1377,12 @@ public class Z80 {
 				}
 				case 0x3B:
 				{ //DEC SP
-					sp--;
+					sp = (sp - 1) & 0xFFFF;
 					return 8;
 				}
 				case 0xCB:
 				{ //SWAP n | RLC n | RL n
-					System.out.println("PC = 0x" + Integer.toHexString(pc) + " | Performing Sub-OPCode 0x"+Integer.toHexString(memory.readByte(pc)).toUpperCase());
+					//System.out.println("PC = 0x" + Integer.toHexString(pc) + " | Performing Sub-OPCode 0x"+Integer.toHexString(memory.readByte(pc)).toUpperCase());
 					switch (memory.readByte(pc++)) {
 						case 0x37:
 							{ //SWAP A
@@ -2621,9 +2668,65 @@ public class Z80 {
 					}
 					case 0x27:
 				{ //DAA 
-					if (getFlag(FLAG_HALFCARRY) == 1) add(REGISTER_A, 0x06);
+					/*if (getFlag(FLAG_HALFCARRY) == 1) add(REGISTER_A, 0x06);
 					if (getFlag(FLAG_CARRY) == 1) add(REGISTER_A, 0x60);
-					resetFlag(FLAG_HALFCARRY);
+					resetFlag(FLAG_HALFCARRY);*/
+
+					int highNibble = registers[REGISTER_A] >> 4;
+					int lowNibble = registers[REGISTER_A] & 0x0F;
+					boolean _FC = true;
+					if (getFlag(FLAG_SUBTRACT)==1) {
+						if (getFlag(FLAG_CARRY)==1) {
+							if (getFlag(FLAG_HALFCARRY)==1) {
+								registers[REGISTER_A] += 0x9A;
+							} else {
+								registers[REGISTER_A] += 0xA0;
+							}
+						} else {
+							_FC = false;
+							if (getFlag(FLAG_HALFCARRY)==1) {
+								registers[REGISTER_A] += 0xFA;
+							} else {
+								registers[REGISTER_A] += 0x00;
+							}
+						}
+					} else if (getFlag(FLAG_CARRY)==1) {
+						if ((getFlag(FLAG_HALFCARRY)==1) || lowNibble > 9) {
+							registers[REGISTER_A] += 0x66;
+						} else {
+							registers[REGISTER_A] += 0x60;
+						}
+					} else if (getFlag(FLAG_HALFCARRY)==1) {
+						if (highNibble > 9) {
+							registers[REGISTER_A] += 0x66;
+						} else {
+							registers[REGISTER_A] += 0x06;
+							_FC = false;
+						}
+					} else if (lowNibble > 9) {
+						if (highNibble < 9) {
+							_FC = false;
+							registers[REGISTER_A] += 0x06;
+						} else {
+							registers[REGISTER_A] += 0x66;
+						}
+					} else if (highNibble > 9) {
+						registers[REGISTER_A] += 0x60;
+					} else {
+						_FC = false;
+					}
+
+					registers[REGISTER_A] &= 0xFF;
+					if (_FC)
+						setFlag(FLAG_CARRY);
+					else
+						resetFlag(FLAG_CARRY);
+					if(registers[REGISTER_A] == 0)
+						setFlag(FLAG_ZERO);
+					else
+						resetFlag(FLAG_ZERO);
+
+
 					return 4;
 				}
 				case 0x2F:
@@ -2655,6 +2758,7 @@ public class Z80 {
 					// ￼￼￼Opcodes:
 					// Instruction Parameters Opcode Cycles
 					// HALT -/- 76 4
+					halt();
 					return 4;
 				}
 				case 0x10:
@@ -2678,6 +2782,7 @@ public class Z80 {
 					// Opcodes:
 					// Instruction Parameters Opcode Cycles
 					// DI -/- F3 4
+					interuptMasterEnable = false;
 					return 4;
 				}
 				case 0xFB:
@@ -2689,6 +2794,7 @@ public class Z80 {
 					// Opcodes:
 					// Instruction Parameters Opcode Cycles
 					// EI -/- FB 4
+					interuptMasterEnable = true;
 					return 4;
 				}
 				case 0x07:
@@ -3046,6 +3152,7 @@ public class Z80 {
 		}
 
 		private void load(int r1, int r2, int value) {
+			value &= 0xFFFF;
 			registers[r1] = value >>> 8;
 			registers[r2] = value & 0xFF;
 		}
@@ -3085,7 +3192,7 @@ public class Z80 {
 			int comb = combine(r1, r2);
 			if (comb == 0xFFFF) comb = 0x0;
 			else comb += 1;
-			load(r1, r2, comb);
+			load(r1, r2, comb & 0xFFFF);
 		}
 
 		private void add(int r1, int data) {
@@ -3111,7 +3218,7 @@ public class Z80 {
 
 			if ((data & 0x0F) > (registers[r1] & 0x0F)) setFlag(FLAG_HALFCARRY);
 
-			if ((sum & 0xFF00) != 0) setFlag(FLAG_CARRY);
+			if (data > registers[r1]) setFlag(FLAG_CARRY);
 
 			registers[r1] = sum & 0xFF;
 			checkZeroFlag(r1);
@@ -3190,6 +3297,7 @@ public class Z80 {
 			clearFlags();
 			int bit7 = registers[r1] >>> 7;
 			registers[r1] <<= 1;
+			registers[r1] &= 0xFF;
 
 			if (registers[r1] == 0) setFlag(FLAG_ZERO);
 
@@ -3202,7 +3310,7 @@ public class Z80 {
 			int bit7 = tempByte >>> 7;
 			tempByte <<= 1;
 
-			writeHL(tempByte);
+			writeHL(tempByte & 0xFFFF);
 
 			if (tempByte == 0) setFlag(FLAG_ZERO);
 
@@ -3213,6 +3321,7 @@ public class Z80 {
 			clearFlags();
 			int bit0 = registers[r1] & 0x1;
 			registers[r1] >>= 1;
+			registers[r1] &= 0xFF;
 
 			if (registers[r1] == 0) setFlag(FLAG_ZERO);
 
@@ -3225,7 +3334,7 @@ public class Z80 {
 			int bit0 = tempByte & 0x1;
 			tempByte >>= 1;
 
-			writeHL(tempByte);
+			writeHL(tempByte & 0xFFFF);
 
 			if (tempByte == 0) setFlag(FLAG_ZERO);
 
@@ -3236,6 +3345,7 @@ public class Z80 {
 			clearFlags();
 			int bit0 = registers[r1] & 0x1;
 			registers[r1] >>>= 1;
+			registers[r1] &= 0xFF;
 
 			if (registers[r1] == 0) setFlag(FLAG_ZERO);
 
@@ -3248,7 +3358,7 @@ public class Z80 {
 			int bit0 = tempByte & 0x1;
 			tempByte >>>= 1;
 
-			writeHL(tempByte);
+			writeHL(tempByte & 0xFFFF);
 
 			if (tempByte == 0) setFlag(FLAG_ZERO);
 
@@ -3399,8 +3509,18 @@ public class Z80 {
 		}
 
 		private void reti() {
+			interuptMasterEnable = true;
+			halted = false;
 			returnOP();
 			interuptMasterEnable = true;
+		}
+
+		private void halt() {
+			if (interuptMasterEnable) {
+				halted = true;
+			} else {
+				stopCounting = true;
+			}
 		}
 
 	} //end class

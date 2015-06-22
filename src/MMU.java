@@ -4,9 +4,9 @@ public class MMU{
 	public char[] catridgeROM;
 	public char[] videoRAM = new char[8192]; //ranges from 0800 > 09FFF (8191 diff)
 	public char[] internalRAM = new char[8192];
-	public char[] spriteOAM = new char[160];
+	public char[] spriteOAM = new char[256]; //[160];
 	public char[] portsIO = new char[128];
-	public char[] highRAM = new char[127];
+	public char[] highRAM = new char[256]; //[127];
 
 	public static final char[] bios = new char[]{
 		0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
@@ -32,10 +32,8 @@ public class MMU{
 	private int _ramBank = 0;
 	private int _memBankNum = 1;
 	private int _MBC1mode = 0; //0=16/8, 1=4/32
-	private boolean _ramStatus;
+	private boolean _ramStatus = false;
 	public boolean _inBIOS = true;
-
-	public static final int DMA_REQUEST = 0xFF46;
 
 	private Z80 cpu;
 
@@ -43,9 +41,10 @@ public class MMU{
 		this.cpu = cpu;
 	}
 
+
 	public void iniGB(long size){
 		catridgeROM = new char[(int)size + 2000];
-		System.out.println("Catridge size: " + size);
+		//System.out.println("Catridge size: " + size);
 		catridgeRAM = new char[8192];
 	}
 
@@ -70,24 +69,24 @@ public class MMU{
 
 	public int readByte(int addr){
 		addr &= 0xFFFF;
-		System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Reading address 0x"+Integer.toHexString(addr).toUpperCase() + " | Returned 0x");
+		//System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Reading address 0x"+Integer.toHexString(addr).toUpperCase() + " | Returned 0x");
 		switch (addr & 0xF000) {
 			//ROM bank 0 (16 kB)
 			case 0x0000:
 			if (_inBIOS){
 					if (addr < 0x100){
-						System.out.println(Integer.toHexString(bios[addr]).toUpperCase() + " .. using BIOS");
+						//System.out.println(Integer.toHexString(bios[addr]).toUpperCase() + " .. using BIOS");
 						return bios[addr] & 0xFF;
 					}
 			}
-			System.out.println(Integer.toHexString(catridgeROM[addr]).toUpperCase() + " .. using ROM bank 0");
+			//System.out.println(Integer.toHexString(catridgeROM[addr]).toUpperCase() + " .. using ROM bank 0");
 			return catridgeROM[addr] & 0xFF;
 
 			case 0x1000:
 			case 0x2000:
 			case 0x3000:
 			{	
-				System.out.println(Integer.toHexString(catridgeROM[addr]).toUpperCase() + " .. using ROM bank 0");
+				//System.out.println(Integer.toHexString(catridgeROM[addr]).toUpperCase() + " .. using ROM bank 0");
 				return catridgeROM[addr] & 0xFF;
 			}
 
@@ -97,7 +96,7 @@ public class MMU{
 			case 0x6000:
 			case 0x7000:
 			{	
-				System.out.println(Integer.toHexString(catridgeROM[addr + (_romBank-1) * 0x4000]).toUpperCase() + " .. using switch ROM");
+				//System.out.println(Integer.toHexString(catridgeROM[addr + (_romBank-1) * 0x4000]).toUpperCase() + " .. using switch ROM");
 				return catridgeROM[addr + (_romBank-1) * 0x4000];
 			}	
 
@@ -105,7 +104,7 @@ public class MMU{
 			case 0x8000:
 			case 0x9000:
 			{ 				
-				System.out.println(Integer.toHexString(videoRAM[addr - 0x8000]).toUpperCase() + " .. using videoRAM");
+				//System.out.println(Integer.toHexString(videoRAM[addr - 0x8000]).toUpperCase() + " .. using videoRAM");
 				return videoRAM[addr - 0x8000];
 			}
 
@@ -113,7 +112,7 @@ public class MMU{
 			case 0xA000:
 			case 0xB000:
 			{
-				System.out.println(Integer.toHexString(catridgeRAM[(addr - 0xA000) + (_ramBank * 0x2000)]).toUpperCase()  + " .. using switch cartRAM"); 
+				//System.out.println(Integer.toHexString(catridgeRAM[(addr - 0xA000) + (_ramBank * 0x2000)]).toUpperCase()  + " .. using switch cartRAM"); 
 				return catridgeRAM[(addr - 0xA000) + (_ramBank * 0x2000)]; 
 			}
 
@@ -121,40 +120,40 @@ public class MMU{
 			case 0xC000:
 			case 0xD000:
 			{ 				
-				System.out.println(Integer.toHexString(internalRAM[addr - 0xC000]).toUpperCase()  + " .. using internal RAM"); 
+				//System.out.println(Integer.toHexString(internalRAM[addr - 0xC000]).toUpperCase()  + " .. using internal RAM"); 
 				return internalRAM[addr - 0xC000]; 
 			}
 
 			//internal RAM ECHO
 			case 0xE000: //ends at 0xFDFF
 			{ 				
-				System.out.println(Integer.toHexString(internalRAM[addr - 0xE000]).toUpperCase()  + " .. using internal RAM echo"); 
+				//System.out.println(Integer.toHexString(internalRAM[addr - 0xE000]).toUpperCase()  + " .. using internal RAM echo"); 
 				return internalRAM[addr - 0xE000]; 
 			}
 
 			case 0xF000:
 			if (addr <= 0xFDFF){
-				System.out.println(Integer.toHexString(internalRAM[addr - 0xE000]).toUpperCase()  + " .. using internal RAM echo"); 
+				//System.out.println(Integer.toHexString(internalRAM[addr - 0xE000]).toUpperCase()  + " .. using internal RAM echo"); 
 				return internalRAM[addr - 0xE000];
 			}
 			else if (addr <= 0xFE9F){
-				System.out.println(Integer.toHexString(spriteOAM[addr - 0xFE00]).toUpperCase() + " .. using spriteOAM"); 
+				//System.out.println(Integer.toHexString(spriteOAM[addr - 0xFE00]).toUpperCase() + " .. using spriteOAM"); 
 				return spriteOAM[addr - 0xFE00];
 			}
 			else if (addr <= 0xFEFF){
-				System.out.println("FF .. using NOT USABLE"); 
+				//System.out.println("FF .. using NOT USABLE"); 
 				return 0xFF; // NOT USABLE
 			}
 			else if (addr <= 0xFF7F){
-				System.out.println(Integer.toHexString(portsIO[addr - 0xFF00]).toUpperCase() + " .. using portsIO"); 
+				//System.out.println(Integer.toHexString(portsIO[addr - 0xFF00]).toUpperCase() + " .. using portsIO"); 
 				return portsIO[addr - 0xFF00];
 			}
 			else if (addr <= 0xFFFE){
-				System.out.println(Integer.toHexString(highRAM[addr - 0xFF80]).toUpperCase() + " .. using highRAM"); 
+				//System.out.println(Integer.toHexString(highRAM[addr - 0xFF80]).toUpperCase() + " .. using highRAM"); 
 				return highRAM[addr - 0xFF80];  
 			}
 			else if (addr == Z80.INTERUPT_ENABLED_REG){
-				System.out.println(Integer.toHexString(interuptEnableRegister & 0xFF).toUpperCase() + " .. using interupt enabled reg"); 
+				//System.out.println(Integer.toHexString(interuptEnableRegister & 0xFF).toUpperCase() + " .. using interupt enabled reg"); 
 				return interuptEnableRegister & 0xFF;
 			}
 		}
@@ -162,12 +161,13 @@ public class MMU{
 	}
 
 	public void writeByte(int addr, int data){
-		System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Writing address 0x"+Integer.toHexString(addr).toUpperCase() + " | with data 0x" + Integer.toHexString(data).toUpperCase());
+		//System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Writing address 0x"+Integer.toHexString(addr).toUpperCase() + " | with data 0x" + Integer.toHexString(data).toUpperCase());
 
 		data &= 0xFF;
+		addr &= 0xFFFF;
 		
 		if (addr == Z80.TIMER_CONTR){
-			System.out.println(" .. using TIMER_CONTR");
+			//System.out.println(" .. using TIMER_CONTR");
 			int oldFreq = cpu.getClockFreq();
 			portsIO[addr - 0xFF00] = (char) data;
 			int newFreq = cpu.getClockFreq();
@@ -176,19 +176,19 @@ public class MMU{
 			return;
 		} else if (addr == Z80.DIVIDE_REG){
 			portsIO[Z80.DIVIDE_REG - 0xFF00] = 0;
-			System.out.println(" .. using DIVIDE_REG (reset)");
+			//System.out.println(" .. using DIVIDE_REG (reset)");
 			return;
 		} else if (addr == GPU.SCANLINE_NUM){
 			portsIO[GPU.SCANLINE_NUM - 0xFF00] = 0;
-			System.out.println(" .. using SCANLINE_NUM (reset)");
+			//System.out.println(" .. using SCANLINE_NUM (reset)");
 			return;
-		} else if (addr == DMA_REQUEST){
-			System.out.println(" .. using DMA transfer");
+		} else if (addr == GPU.DMA_REQUEST){
+			//System.out.println(" .. using DMA transfer");
 			doDMATransfer(data);
 			return;
 		} else if ((addr == 0xFF50) && (data == 0x01)){ //unmap bios
 			_inBIOS = false;
-			System.out.println("unmapped bios");
+			//System.out.println("unmapped bios");
 			return;
 		}
 
@@ -197,12 +197,14 @@ public class MMU{
 			
 			case 0x0000:
 			case 0x1000:
-			ramEnable(data); System.out.println(" .. using ROM bank 0"); break;
+			ramEnable(data); //System.out.println(" .. using ROM bank 0"); 
+			break;
 			
 			//rom bank switch
 			case 0x2000:
 			case 0x3000:
-			romBankLo(data); System.out.println(" .. using ROM bank Lo switch"); break;
+			romBankLo(data); //System.out.println(" .. using ROM bank Lo switch"); 
+			break;
 
 			case 0x4000:
 			case 0x5000:
@@ -210,56 +212,61 @@ public class MMU{
 				if (_memBankNum == 1){
 					if (_MBC1mode == 0){
 						romBankHi(data);
-						System.out.println(" .. using ROM bank Hi switch");
+						//System.out.println(" .. using ROM bank Hi switch");
 					}
 					else{
 						ramBankSelect(data);
-						System.out.println(" .. using RAM bank selecter");
+						//System.out.println(" .. using RAM bank selecter");
 					}
 				}
 			} break;
 
 			case 0x6000:
 			case 0x7000:
-			memoryModelSelect(data); System.out.println(" .. using memory model select"); break;
+			memoryModelSelect(data); //System.out.println(" .. using memory model select"); 
+			break;
 
 			case 0x8000:
 			case 0x9000:
-			videoRAM[addr - 0x8000] = (char) data; System.out.println(" .. using videoRAM"); break;
+			videoRAM[addr - 0x8000] = (char) data; //System.out.println(" .. using videoRAM"); 
+			break;
 
 			case 0xA000:
 			case 0xB000:
-			catridgeRAM[(addr - 0xA000) + (_ramBank * 0x2000)] = (char) data; System.out.println(" .. using cartRAM bank"); break;
+			catridgeRAM[(addr - 0xA000) + (_ramBank * 0x2000)] = (char) data; //System.out.println(" .. using cartRAM bank"); 
+			break;
 			
 			case 0xC000:
 			case 0xD000:
-			internalRAM[addr - 0xC000] = (char) data; System.out.println(" .. using internal RAM"); break;
+			internalRAM[addr - 0xC000] = (char) data; //System.out.println(" .. using internal RAM"); 
+			break;
 
 			case 0xE000:
-			internalRAM[addr - 0xE000] = (char) data; System.out.println(" .. using internal RAM echo"); break;
+			internalRAM[addr - 0xE000] = (char) data; //System.out.println(" .. using internal RAM echo"); 
+			break;
 
 			case 0xF000:
 				if (addr <= 0xFDFF){
 					internalRAM[addr - 0xE000] = (char) data;
-					System.out.println(" .. using internal RAM echo");
+					//System.out.println(" .. using internal RAM echo");
 				}
 				else if (addr <= 0xFE9F){
 					spriteOAM[addr - 0xFE00] = (char) data;
-					System.out.println(" .. using spriteOAM");
+					//System.out.println(" .. using spriteOAM");
 				}
 				else if (addr <= 0xFEFF){
-					System.out.println(" .. using NOT USABLE");
+					//System.out.println(" .. using NOT USABLE");
 				} // NOT USABLE
 				else if (addr <= 0xFF7F){
 					portsIO[addr - 0xFF00] = (char) data;
-					System.out.println(" .. using portsIO");
+					//System.out.println(" .. using portsIO");
 				}
 				else if (addr <= 0xFFFE){
 					highRAM[addr - 0xFF80] = (char) data;
-					System.out.println(" .. using highRAM");
+					//System.out.println(" .. using highRAM");
 				}
 				else if (addr == Z80.INTERUPT_ENABLED_REG){
-					System.out.println(" .. using interupt enable register");
+					//System.out.println(" .. using interupt enable register");
 					interuptEnableRegister = (char) data;
 				}
 				break;

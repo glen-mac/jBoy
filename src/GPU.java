@@ -1,4 +1,5 @@
 import javax.swing.JFrame;
+import java.awt.Color;
 
 public class GPU {
 
@@ -18,6 +19,8 @@ public class GPU {
 
 	public static final int SCANLINE_NUM = 0xFF44;
 	public static final int SCANLINE_COMP = 0xFF45;
+
+	public static final int DMA_REQUEST = 0xFF46;
 
 	public static final int LCD_CONTR_REG = 0xFF40;
 	/* Bit 7 - LCD Display Enable (0=Off, 1=On)
@@ -42,149 +45,152 @@ public class GPU {
 	Bit 5: Mode 2 Interupt Enabled 
 	Bit 6: Coincidence Interupt Enabled */
 
-	private boolean second = false;
+	private int _LCDmode = 2;
+	private int _modeClock = 0;
+	public int tileSet[][] = new int[160][144];
 
-	private int mode = 2;
-	private int modeClock;
-	private int line;
-	public int tileSet[][][] = new int[160][144][3];
+///////////////////////// 
+	/*public int backgroundBuffer[][] = new int[256][256];
+	public boolean backgroundTileInvalidated[][] = new boolean[32][32];
+	public boolean invalidateAllBackgroundTilesRequest;
+	public int windowBuffer[][] = new int[144][168];*/
+//////////////////////////
+
+
 	public Z80 cpu;
 	private gbScreen screen;
 
-	public void step(int cycles) {
+	public void updateGraphics(int cycles) {
+		screen.resetScreen();
 
-		int status = cpu.memory.readByte(LCD_STATUS);
 		boolean reqInt = false;
 
-		System.out.println("GPU MODE = " + mode);
+		int status = cpu.memory.readByte(LCD_STATUS);
+
+		//System.out.println("GPU MODE = " + mode);
 
 		if (isLCDEnabled()) {
-			modeClock += cycles;
-			System.out.println("LCD ENABLED");
+			_modeClock += cycles;
+			//System.out.println("LCD ENABLED");
 		}
 		else {
-			System.out.println("LCD DISABLED");
+			//System.out.println("LCD DISABLED");
 			status = cpu.bitSet(status & 0xFC, 0); //1111 1101
 			//mode = 1;
-			modeClock = 0;
-			line = 0;
-			cpu.memory.writeByte(SCANLINE_NUM, 0);
+			//_modeClock = 0;
+			//line = 0;
+			cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] = 0;
 			cpu.memory.writeByte(LCD_STATUS, status);
 			return;
 		}
 
-			System.out.println("MODECLOCK = " + modeClock);
-			System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] + " (0x"+Integer.toHexString(cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]).toUpperCase()+")");
-			System.out.println("ZERO FLAG = " + cpu.getFlag(cpu.FLAG_ZERO));
+			//System.out.println("MODECLOCK = " + _modeClock);
+			//System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] + " (0x"+Integer.toHexString(cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]).toUpperCase()+")");
+			//System.out.println("ZERO FLAG = " + cpu.getFlag(cpu.FLAG_ZERO));
 
-		switch (mode) {
+		switch (_LCDmode) {
 
-			case 0:
-				 //Horizontal blank
-					if (modeClock >= 204) {
-						modeClock = 0;
-						System.out.println("SCAN Before = " + cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
-						cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]++;
-						System.out.println("Scan After = " + cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
-						//line++;
-						if (cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] == 143) { //reached height
-							cpu.requestInterupt(0);
+			case 0:	//Horizontal blank
+			
+			if (_modeClock >= 204) {
+				_modeClock = 0;
+				cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]++;
+				if (cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] == 143) { //reached height
+					cpu.requestInterupt(0);
+					_LCDmode = 1; //begin vertical blank
+					status = cpu.bitSet(status, 0);
+					status = cpu.bitReset(status, 1);
+					reqInt = cpu.bitTest(status, 4);
+					renderFrame(); //render image
+				} else {
+					//renderScan();
+					_LCDmode = 2;
+					status = cpu.bitSet(status, 1);
+					status = cpu.bitReset(status, 0);
+					reqInt = cpu.bitTest(status, 5);
+				}
+			}
+			break;
+			
+			case 1:	//Vertical blank
 
-							mode = 1; //begin vertical blank
-							status = cpu.bitSet(status, 0);
-							status = cpu.bitReset(status, 1);
-							reqInt = cpu.bitTest(status, 4);
-							renderFrame(); //render image
-						} else {
-							renderScan();
-							mode = 2;
-							status = cpu.bitSet(status, 1);
-							status = cpu.bitReset(status, 0);
-							reqInt = cpu.bitTest(status, 5);
-						}
-					}
-				break;
-				case 1:
-				//Vertical blank
-					//if (second == true)
-						
-
-
-					if (modeClock >= 456) {
-						modeClock = 0;
-						//line++;
-						cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]++;
-						System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
-						//System.exit(1);
-						if (cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] == 153) { //Full frame (scans and vblank)
+			if (_modeClock >= 456) {
+				_modeClock = 0;
+				cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]++;
+						//System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
+						if (cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] > 153) { //Full frame (scans and vblank)
 							cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] = 0;
-							mode = 2;
+							_LCDmode = 2;
 							status = cpu.bitSet(status, 1);
 							status = cpu.bitReset(status, 0);
 							reqInt = cpu.bitTest(status, 5);
 						}
 					}
-				break;
-				case 2:
+					break;
+					case 2:
 				//Scanline (accessing OAM)
-					if (modeClock >= 80) {
-						mode = 3;
-						modeClock = 0;
+					if (_modeClock >= 80) {
+						_LCDmode = 3;
+						status = cpu.bitSet(status, 1);
+						status = cpu.bitSet(status, 0);
+						_modeClock = 0;
 					}
-				break;
-				case 3:
+					break;
+					case 3:
 				//Scanline (accessing VRAM)
-					if (modeClock >= 172) {
+					if (_modeClock >= 172) {
 
 						// Enter hblank
-						mode = 0;
+						_LCDmode = 0;
 						status = cpu.bitReset(status, 1);
 						status = cpu.bitReset(status, 0);
 						reqInt = cpu.bitTest(status, 3);
 
-						modeClock = 0;
+						_modeClock = 0;
+
+						renderScan(); //shouldnt be here
 					}
-				break;
-			}
+					break;
+				}
 
-			if (reqInt)
-				cpu.requestInterupt(1);
-
-			if (cpu.memory.readByte(SCANLINE_NUM) == cpu.memory.readByte(SCANLINE_COMP)){
-				status = cpu.bitSet(status, 2);
-				if(cpu.bitTest(status, 6))
+				if (reqInt)
 					cpu.requestInterupt(1);
+
+				if (cpu.memory.readByte(SCANLINE_NUM) == cpu.memory.readByte(SCANLINE_COMP)){
+					status = cpu.bitSet(status, 2);
+					if(cpu.bitTest(status, 6))
+						cpu.requestInterupt(1);
+				}
+				else
+					status = cpu.bitReset(status, 2);
+
+				cpu.memory.writeByte(LCD_STATUS, status);
+
 			}
-			else
-				status = cpu.bitReset(status, 2);
 
-			cpu.memory.writeByte(LCD_STATUS, status);
+			private boolean isLCDEnabled() {
+				return cpu.bitTest(cpu.memory.readByte(LCD_CONTR_REG), 7);
+			}
 
-		}
+			public void renderFrame() {
+				screen.fillCanvas();
+			}
 
-		private boolean isLCDEnabled() {
-			return cpu.bitTest(cpu.memory.readByte(LCD_CONTR_REG), 7);
-		}
+			public void renderScan(){
+				int control = cpu.memory.readByte(LCD_CONTR_REG);
+				if (cpu.bitTest(control, 0))
+					renderTiles();
+				if (cpu.bitTest(control, 1))
+					renderSprites();
+			}
 
-		public void renderFrame() {
-			screen.fillCanvas();
-		}
+			private void renderSprites(){
 
-		public void renderScan(){
-			int control = cpu.memory.readByte(LCD_CONTR_REG);
-			if (cpu.bitTest(control, 0))
-				renderTiles();
-			if (cpu.bitTest(control, 1))
-				renderSprites();
-		}
+			}
 
-		private void renderSprites(){
-
-		}
-
-		private void renderTiles(){
-			int scrollY = cpu.memory.readByte(SCROLL_Y);
-			int scrollX = cpu.memory.readByte(SCROLL_X);
+			private void renderTiles(){
+				int scrollY = cpu.memory.readByte(SCROLL_Y);
+				int scrollX = cpu.memory.readByte(SCROLL_X);
 			int windowX = cpu.memory.readByte(WINDOW_X) - 7; //shifted 7 pixels
 			int windowY = cpu.memory.readByte(WINDOW_Y);
 			int scanLine = cpu.memory.readByte(SCANLINE_NUM);
@@ -211,94 +217,141 @@ public class GPU {
 	Bit 1 - OBJ (Sprite) Display Enable (0=Off, 1=On)
 	Bit 0 - BG Display (for CGB see below) (0=Off, 1=On) */
 
-			if (cpu.bitTest(LCD_CONTR_REG, 5) && (scanLine >= windowY))
-				inWindow = true;
+	if (cpu.bitTest(LCD_CONTR_REG, 5) && (scanLine >= windowY))
+		inWindow = true;
 
-			if (cpu.bitTest(LCD_CONTR_REG, 4))
-				tileData = 0x8000;
-			else {
-				signed = true;
-				tileData = 0x8800;
-			}
+	if (cpu.bitTest(LCD_CONTR_REG, 4))
+		tileData = 0x8000;
+	else {
+		signed = true;
+		tileData = 0x8800;
+	}
 
-			if (inWindow)
-				tileListMem = (cpu.bitTest(LCD_CONTR_REG, 6)) ? 0x9C00 : 0x9800;
-			else
-				tileListMem = (cpu.bitTest(LCD_CONTR_REG, 3)) ? 0x9C00 : 0x9800;
-
-			
-			if (inWindow)
-				yPos = scanLine - windowY;
-			else
-				yPos = scrollY + scanLine;
-
-			tileRow = yPos / 8;
-
-			for(int pixel = 0; pixel < 160; pixel++){
-
-				if (inWindow)
-					xPos = pixel - windowX;
-				else
-					xPos = scrollX + pixel;
+	if (inWindow)
+		tileListMem = (cpu.bitTest(LCD_CONTR_REG, 6)) ? 0x9C00 : 0x9800;
+	else
+		tileListMem = (cpu.bitTest(LCD_CONTR_REG, 3)) ? 0x9C00 : 0x9800;
 
 
-				tileCol = xPos / 8;
+	if (inWindow)
+		yPos = scanLine - windowY;
+	else
+		yPos = scanLine + scrollY;
 
-				tileAddr = tileListMem + tileCol + (32 * tileRow); 
+	tileRow = yPos / 8;
 
-				if (signed)
-					tileDataAddr = (cpu.memory.readByte(tileAddr) + 128) * TILE_SIZE;
-				else
-					tileDataAddr = cpu.memory.readByte(tileAddr) * TILE_SIZE;
+	for(int pixel = 0; pixel < 160; pixel++){
 
-				tileLine = (yPos % 8) * 2;
-				data1 = cpu.memory.readByte(tileAddr + tileLine);
-				data2 = cpu.memory.readByte(tileAddr + tileLine + 1);
+		xPos = scrollX + pixel;
 
-				colourBit = xPos % 8;
+		if (inWindow && (pixel >= windowX))
+			xPos = pixel - windowX;
 
-				colourBit = (data2 >>> colourBit) | (data1 >>> colourBit);
+		tileCol = xPos / 8;
 
-				tileSet[pixel][scanLine] = getColour(colourBit);
+		tileAddr = tileListMem + tileCol + (32 * tileRow); 
+
+		if (signed)
+			tileDataAddr = (((byte) cpu.memory.readByte(tileAddr)) + 128) * TILE_SIZE;
+		else
+			tileDataAddr = ((char) cpu.memory.readByte(tileAddr)) * TILE_SIZE;
+
+		tileLine = (yPos % 8) * 2;
+		data1 = cpu.memory.readByte(tileAddr + tileLine);
+		data2 = cpu.memory.readByte(tileAddr + tileLine + 1);
+
+		colourBit = xPos % 8;
+
+				/////////////
+
+		colourBit -= 7 ;
+		colourBit *= -1 ;
+
+		int colourNum = cpu.bitGet(data2,colourBit) ;
+		colourNum <<= 1;
+		colourNum |= cpu.bitGet(data1,colourBit) ;
+
+		Color col = getColour(colourNum);
+
+				/////////////
+
+				//colourBit = (data2 >>> colourBit) | (data1 >>> colourBit);
+
+		tileSet[pixel][scanLine] = col.getRGB();
 
 	/* Every two bits in the palette data byte represent a colour. 
 	Bits 7-6 maps to colour id 11, bits 5-4 map to colour id 10, 
 	bits 3-2 map to colour id 01 and bits 1-0 map to colour id 00.*/
 
 
-			}
-		}
+}
+}
 
-		private int[] getColour(int colourID){
+public char getScanLine(){
+	return cpu.memory.portsIO[SCANLINE_NUM - 0xFF00];
+}
 
-			int colNum = 0;
-			int[] returnCol = new int[] {0, 0, 0};
-			int palette = cpu.memory.readByte(CLR_PLT_BKG);
+private Color getColour(int colourID){
 
-			switch(colourID){
-				case 0: colNum = palette & 0x3; break;
-				case 1: colNum = (palette & 0xC) >>> 2; break;
-				case 2: colNum = (palette & 0x30) >>> 4; break;
-				case 3: colNum = (palette & 0xC0) >>> 6; break;
-			}
+	int colNum = 0;
+			//int[] returnCol = new int[] {0, 0, 0};
+	Color returnCol = Color.BLACK;
+	int palette = cpu.memory.readByte(CLR_PLT_BKG);
 
-			switch(colNum){
-				case 0: returnCol = new int[] {255, 255, 255}; break;
-				case 1: returnCol = new int[] {0xCC, 0xCC, 0xCC}; break;
-				case 2: returnCol = new int[] {0x77, 0x77, 0x77}; break;
-				case 3: returnCol = new int[] {0, 0, 0}; break;
+	switch(colourID){
+		case 0: colNum = palette & 0x3; break;
+		case 1: colNum = (palette & 0xC) >>> 2; break;
+		case 2: colNum = (palette & 0x30) >>> 4; break;
+		case 3: colNum = (palette & 0xC0) >>> 6; break;
+	}
+
+	switch(colNum){
+				case 0: returnCol =  Color.WHITE; break; //new int[] {255, 255, 255};
+				case 1: returnCol = Color.LIGHT_GRAY;  break; //new int[] {192, 192, 192};
+				case 2: returnCol = Color.DARK_GRAY;  break; //new int[] {96, 96, 96};
+				case 3: returnCol = Color.BLACK; break; //new int[] {0, 0, 0}; 
 			}
 			return returnCol; 
+			/*Color res = Color.WHITE ;
+			char palette = (char) cpu.memory.readByte(CLR_PLT_BKG);
+			int hi = 0 ;;
+			int lo = 0 ;
+
+			switch (colourID)
+			{
+				case 0: hi = 1 ; lo = 0 ;break ;
+				case 1: hi = 3 ; lo = 2 ;break ;
+				case 2: hi = 5 ; lo = 4 ;break ;
+				case 3: hi = 7 ; lo = 6 ;break ;
+				default: assert(false) ; break ;
+			}
+
+			int colour = 0;
+			colour = cpu.bitGet(palette, hi) << 1;
+			colour |= cpu.bitGet(palette, lo) ;
+
+			switch (colour)
+			{
+				case 0: res = Color.WHITE ;break ;
+				case 1: res = Color.LIGHT_GRAY ;break ;
+				case 2: res = Color.DARK_GRAY ;break ;
+				case 3: res = Color.BLACK ;break ;
+				default: assert(false) ; break ;
+			}
+
+			return res ;*/
 		}
 
 		public void reset() {
 			//tileSet = new int[384][8];
-			for (int i = 0; i < 384; i++) {
-				for (int j = 0; j < 8; j++) {
+			//for (int i = 0; i < 384; i++) {
+				//for (int j = 0; j < 8; j++) {
 				//tileSet[i][j] = {0, 0, 0, 0, 0, 0, 0, 0};
-				}
-			}
+				//}
+			//}
 		}
+
+
 
 		public GPU(Z80 cpu) {
 			this.cpu = cpu;

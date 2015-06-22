@@ -5,8 +5,12 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import java.util.Random;
+
 
 public class gbScreen extends JPanel{
+
+	private static final Random random = new Random();
 
 	private BufferedImage canvas;
 	GPU gpu;
@@ -27,41 +31,30 @@ public class gbScreen extends JPanel{
 		g2.drawImage(canvas, null, null);
 	}
 
+	private Color randomColor() {
+		return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
+	}
 
 	public void fillCanvas() {
 		for (int y = 0; y < canvas.getHeight(); y++) {
 			for (int x = 0; x < canvas.getWidth(); x++) {
+				/*gpu.tileSet[x][y][0] = 0 ;
+				gpu.tileSet[x][y][1] = 0 ;
+				gpu.tileSet[x][y][2] = 0 ;
 				int r = gpu.tileSet[x][y][0];
 				int g = gpu.tileSet[x][y][1];
 				int b = gpu.tileSet[x][y][2];
-				int col = (r << 16) | (g << 8) | b;
-				canvas.setRGB(x, y, col);
-				if (!(gpu.cpu.memory._inBIOS))
-					System.out.println("x="+x+" y="+y+" colour="+col);
+				int col = (r << 16) | (g << 8) | b;*/
+				canvas.setRGB(x, y, gpu.tileSet[x][y]);
+				//if (!(gpu.cpu.memory._inBIOS))
+				//	System.out.println("x="+x+" y="+y+" colour="+gpu.tileSet[x][y]);
 			}
 		}
 		repaint();
 	}
 
-    // public void drawLine(Color c, int x1, int y1, int x2, int y2) {
-    //     // Implement line drawing
-    //     repaint();
-    // }
+	public void resetScreen(){
 
-    // public void drawRect(Color c, int x1, int y1, int width, int height) {
-    //     int color = c.getRGB();
-    //     // Implement rectangle drawing
-    //     for (int x = x1; x < x1 + width; x++) {
-    //         for (int y = y1; y < y1 + height; y++) {
-    //             canvas.setRGB(x, y, color);
-    //         }
-    //     }
-    //     repaint();
-    // }
-
-    // public void drawOval(Color c, int x1, int y1, int width, int height) {
-    //     // Implement oval drawing
-    //     repaint();
-    // }
+	}
 
 }
