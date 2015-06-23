@@ -3031,15 +3031,16 @@ public class Z80 {
 
 		private void rotateLeft(int r1) {
 			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT, FLAG_CARRY});
-			if (memory.readByte(pc - 1) == 0xCB)
-				resetFlag(FLAG_ZERO);
 
 			int bit7 = registers[r1] >>> 7;
 			registers[r1] <<= 1;
 			registers[r1] |= bit7;
 			registers[r1] &= 0xFF;
 
-			checkZeroFlag(r1);
+			if (memory.readByte(pc - 1) == 0xCB)
+				checkZeroFlag(r1);
+			else
+				resetFlag(FLAG_ZERO);
 
 			if (bit7 == 1) setFlag(FLAG_CARRY);
 		}
@@ -3061,17 +3062,21 @@ public class Z80 {
 
 		private void rotateLeftCarry(int r1) {
 			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT});
-			if (memory.readByte(pc - 1) == 0xCB)
-				resetFlag(FLAG_ZERO);
 
 			int bit7 = (registers[r1] >>> 7) & 0x1;
 			registers[r1] <<= 1;
 			registers[r1] |= getFlag(FLAG_CARRY);
 			registers[r1] &= 0xFF;
 
-			checkZeroFlag(r1);
+			if (memory.readByte(pc - 1) == 0xCB)
+				checkZeroFlag(r1);
+			else
+				resetFlag(FLAG_ZERO);
 
-			if (bit7 == 1) setFlag(FLAG_CARRY);
+			if (bit7 == 1)
+				setFlag(FLAG_CARRY);
+			else
+				resetFlag(FLAG_CARRY);
 		}
 
 		private void rotateLeftCarryHL() {
@@ -3089,37 +3094,45 @@ public class Z80 {
 
 			if (tempByte == 0) setFlag(FLAG_ZERO);
 
-			if (bit7 == 1) setFlag(FLAG_CARRY);
+			if (bit7 == 1) 
+				setFlag(FLAG_CARRY);
+			else
+				resetFlag(FLAG_CARRY);
 		}
 
 		private void rotateRight(int r1) {
 			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT, FLAG_CARRY});
-			if (memory.readByte(pc - 1) == 0xCB)
-				resetFlag(FLAG_ZERO);
 
 			int bit0 = registers[r1] & 0x1;
 			registers[r1] >>>= 1;
 			registers[r1] |= bit0 << 7;
 			registers[r1] &= 0xFF;
 
-			if (registers[r1] == 0) setFlag(FLAG_ZERO);
+			if (memory.readByte(pc - 1) == 0xCB)
+				checkZeroFlag(r1);
+			else
+				resetFlag(FLAG_ZERO);
 
 			if (bit0 == 1) setFlag(FLAG_CARRY);
 		}
 
 		private void rotateRightCarry(int r1) {
 			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT});
-			if (memory.readByte(pc - 1) == 0xCB)
-				resetFlag(FLAG_ZERO);
 
 			int bit0 = registers[r1] & 0x1;
 			registers[r1] >>>= 1;
 			registers[r1] |= getFlag(FLAG_CARRY) << 7;
 			registers[r1] &= 0xFF;
 
-			if (registers[r1] == 0) setFlag(FLAG_ZERO);
+			if (memory.readByte(pc - 1) == 0xCB)
+				checkZeroFlag(r1);
+			else
+				resetFlag(FLAG_ZERO);
 
-			if (bit0 == 1) setFlag(FLAG_CARRY);
+			if (bit0 == 1) 
+				setFlag(FLAG_CARRY);
+			else
+				resetFlag(FLAG_CARRY);
 		}
 
 		private void rotateRightHL() {
@@ -3152,7 +3165,10 @@ public class Z80 {
 
 			if (tempByte == 0) setFlag(FLAG_ZERO);
 
-			if (bit0 == 1) setFlag(FLAG_CARRY);
+			if (bit0 == 1)
+				setFlag(FLAG_CARRY);
+			else
+				resetFlag(FLAG_CARRY);
 		}
 
 		private int combine(int r1, int r2) {
