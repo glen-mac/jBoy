@@ -48,7 +48,7 @@ public class Z80 {
 	int[] registers = new int[8]; // 8-bit registers
 	boolean doReset = false;
 
-	boolean halted;
+	public boolean halted;
 	boolean stopCounting;
 
 	int opCode;
@@ -63,56 +63,42 @@ public class Z80 {
 	public void playCartridge() {
 		Scanner sc = new Scanner(System.in);
 		boolean step = false;
-		while (!doReset) {
+		while (!doReset){
 			if (!halted){
+				/*if (pc ==0x0C)
+					step =true;
+				if (step)
+					while (!(sc.nextLine().trim().isEmpty())){}*/
 				opCode = memory.readByte(pc++);
 				numCycles = execute(opCode);
 				updateTimers(numCycles);
 				graphics.updateGraphics(numCycles);
 				checkInterupts();
-			/*if (pc ==0xE0)
-				step =true;
-			if (step)
-			while (!(sc.nextLine().trim().isEmpty())){}*/
-
-
-				//for (int i = 0; i<100; i++)
-					//System.out.println("############################################################################################3");
-
-			//}
-		}
-}
-}
-
-private boolean isClockEnabled() {
-	boolean result = false;
-	if (((memory.readByte(TIMER_CONTR) >>> 2) & 0x1) == 1) result = true;
-	return result;
-}
-
-public void setClockFreq() {
-	switch (getClockFreq()) {
-		case 0:
-		timerCounter = 1024;
-				break; // freq 4096
-				case 1:
-				timerCounter = 16;
-				break; // freq 262144
-				case 2:
-				timerCounter = 64;
-				break; // freq 65536
-				case 3:
-				timerCounter = 256;
-				break; // freq 16382
 			}
 		}
+	}
 
-		public int getClockFreq() {
-			return (memory.readByte(TIMER_CONTR) & 0x3);
+	private boolean isClockEnabled() {
+		boolean result = false;
+		if (((memory.readByte(TIMER_CONTR) >>> 2) & 0x1) == 1) result = true;
+		return result;
+	}
+
+	public void setClockFreq() {
+		switch (getClockFreq()) {
+			case 0: timerCounter = 1024;	break; // freq 4096
+			case 1: timerCounter = 16;		break; // freq 262144
+			case 2:timerCounter = 64;		break; // freq 65536
+			case 3:timerCounter = 256;		break; // freq 16382
 		}
+	}
 
-		private void updateDivideRegister(int cycles) {
-			divideCounter += cycles;
+	public int getClockFreq() {
+		return (memory.readByte(TIMER_CONTR) & 0x3);
+	}
+
+	private void updateDivideRegister(int cycles) {
+		divideCounter += cycles;
 		if (divideCounter >= 255) { //freq is 16382 Hz
 			divideCounter = 0;
 			memory.portsIO[DIVIDE_REG - 0xFF00]++;
@@ -149,37 +135,37 @@ public void setClockFreq() {
 		//0x0100;
 		memory.reset();
 
-	memory.writeByte(0xFF05, 0x00); // TIMA
-      memory.writeByte(0xFF06, 0x00); // TMA
-      memory.writeByte(0xFF07, 0x00); // TAC
-      memory.writeByte(0xFF10, 0x80); // NR10
-      memory.writeByte(0xFF11, 0xBF); // NR11
-      memory.writeByte(0xFF12, 0xF3); // NR12
-      memory.writeByte(0xFF14, 0xBF); // NR14
-      memory.writeByte(0xFF16, 0x3F); // NR21
-      memory.writeByte(0xFF17, 0x00); // NR22
-      memory.writeByte(0xFF19, 0xBF); // NR24
-      memory.writeByte(0xFF1A, 0x7F); // NR30
-      memory.writeByte(0xFF1B, 0xFF); // NR31
-      memory.writeByte(0xFF1C, 0x9F); // NR32
-      memory.writeByte(0xFF1E, 0xBF); // NR33
-      memory.writeByte(0xFF20, 0xFF); // NR41
-      memory.writeByte(0xFF21, 0x00); // NR42
-      memory.writeByte(0xFF22, 0x00); // NR43
-      memory.writeByte(0xFF23, 0xBF); // NR30
-      memory.writeByte(0xFF24, 0x77); // NR50
-      memory.writeByte(0xFF25, 0xF3); // NR51
-      memory.writeByte(0xFF26, 0xF1); // NR52
-      memory.writeByte(0xFF40, 0x91); // LCDC
-      memory.writeByte(0xFF42, 0x00); // SCY
-      memory.writeByte(0xFF43, 0x00); // SCX
-      memory.writeByte(0xFF45, 0x00); // LYC
-      memory.writeByte(0xFF47, 0xFC); // BGP
-      memory.writeByte(0xFF48, 0xFF); // OBP0
-      memory.writeByte(0xFF49, 0xFF); // OBP1
-      memory.writeByte(0xFF4A, 0x00); // WY
-      memory.writeByte(0xFF4B, 0x00); // WX
-      memory.writeByte(0xFFFF, 0x00); // IE
+		memory.writeByte(0xFF05, 0x00); // TIMA
+		memory.writeByte(0xFF06, 0x00); // TMA
+		memory.writeByte(0xFF07, 0x00); // TAC
+		memory.writeByte(0xFF10, 0x80); // NR10
+		memory.writeByte(0xFF11, 0xBF); // NR11
+		memory.writeByte(0xFF12, 0xF3); // NR12
+		memory.writeByte(0xFF14, 0xBF); // NR14
+		memory.writeByte(0xFF16, 0x3F); // NR21
+		memory.writeByte(0xFF17, 0x00); // NR22
+		memory.writeByte(0xFF19, 0xBF); // NR24
+		memory.writeByte(0xFF1A, 0x7F); // NR30
+		memory.writeByte(0xFF1B, 0xFF); // NR31
+		memory.writeByte(0xFF1C, 0x9F); // NR32
+		memory.writeByte(0xFF1E, 0xBF); // NR33
+		memory.writeByte(0xFF20, 0xFF); // NR41
+		memory.writeByte(0xFF21, 0x00); // NR42
+		memory.writeByte(0xFF22, 0x00); // NR43
+		memory.writeByte(0xFF23, 0xBF); // NR30
+		memory.writeByte(0xFF24, 0x77); // NR50
+		memory.writeByte(0xFF25, 0xF3); // NR51
+		memory.writeByte(0xFF26, 0xF1); // NR52
+		memory.writeByte(0xFF40, 0x91); // LCDC
+		memory.writeByte(0xFF42, 0x00); // SCY
+		memory.writeByte(0xFF43, 0x00); // SCX
+		memory.writeByte(0xFF45, 0x00); // LYC
+		memory.writeByte(0xFF47, 0xFC); // BGP
+		memory.writeByte(0xFF48, 0xFF); // OBP0
+		memory.writeByte(0xFF49, 0xFF); // OBP1
+		memory.writeByte(0xFF4A, 0x00); // WY
+		memory.writeByte(0xFF4B, 0x00); // WX
+		memory.writeByte(0xFFFF, 0x00); // IE
 	}
 
 	public void loadCartridge(String fileName) {
@@ -191,19 +177,19 @@ public void setClockFreq() {
 			//fis.read((byte[]) memory.catridgeROM);
 			int i = 0;
 			while (fis.available() > 0) {
-				memory.catridgeROM[i++] = (char) fis.read();
+				memory.catridgeROM[i++] = (short) fis.read();
 			}
 			fis.close(); //close the file
 
 			//System.out.println("finished cart");
 		} catch (FileNotFoundException ex) {
-			System.out.println("ERROR: File '" + fileName + "' not found!\n");
+			//System.out.println("ERROR: File '" + fileName + "' not found!\n");
 			System.exit(0);
 		} catch (IOException ex) {
-			System.out.println("ERROR: An I/O exception of some sort has occurred!\n");
+			//System.out.println("ERROR: An I/O exception of some sort has occurred!\n");
 			System.exit(0);
 		} catch (Exception ex) {
-			System.out.println("ERROR: An exception of some sort has occurred!\n");
+			//System.out.println("ERROR: An exception of some sort has occurred!\n");
 			System.exit(0);
 		}
 	}
@@ -211,7 +197,6 @@ public void setClockFreq() {
 	public void requestInterupt(int bitNum){
 		memory.writeByte(INTERUPT_REQUEST_REG, bitSet(memory.readByte(INTERUPT_REQUEST_REG), bitNum));
 		//System.out.println("INTERRUPT " + bitNum);
-		//System.exit(1);
 	}
 
 	private void checkInterupts(){
@@ -276,11 +261,11 @@ public void setClockFreq() {
 		return word & 0xFF;
 	}
 
-	static public char unsign(int b) {
+	static public short unsign(int b) {
 		if (b < 0) {
-			return (char) (256 + b);
+			return (short) (256 + b);
 		} else {
-			return (char) b;
+			return (short) b;
 		}
 	}
 
@@ -3039,8 +3024,16 @@ public void setClockFreq() {
 			registers[REGISTER_F] = 0;
 		}
 
+		private void clearFlags(int[] flagArr) {
+			for(int num : flagArr)
+				resetFlag(num);
+		}
+
 		private void rotateLeft(int r1) {
-			clearFlags();
+			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT, FLAG_CARRY});
+			if (memory.readByte(pc - 1) == 0xCB)
+				resetFlag(FLAG_ZERO);
+
 			int bit7 = registers[r1] >>> 7;
 			registers[r1] <<= 1;
 			registers[r1] |= bit7;
@@ -3067,7 +3060,10 @@ public void setClockFreq() {
 		}
 
 		private void rotateLeftCarry(int r1) {
-			clearFlags();
+			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT});
+			if (memory.readByte(pc - 1) == 0xCB)
+				resetFlag(FLAG_ZERO);
+
 			int bit7 = (registers[r1] >>> 7) & 0x1;
 			registers[r1] <<= 1;
 			registers[r1] |= getFlag(FLAG_CARRY);
@@ -3079,7 +3075,10 @@ public void setClockFreq() {
 		}
 
 		private void rotateLeftCarryHL() {
+			int flagStat = getFlag(FLAG_CARRY);
 			clearFlags();
+			loadFlag(FLAG_CARRY, flagStat);
+
 			int tempByte = readHL();
 			int bit7 = tempByte >>> 7;
 			tempByte <<= 1;
@@ -3094,7 +3093,10 @@ public void setClockFreq() {
 		}
 
 		private void rotateRight(int r1) {
-			clearFlags();
+			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT, FLAG_CARRY});
+			if (memory.readByte(pc - 1) == 0xCB)
+				resetFlag(FLAG_ZERO);
+
 			int bit0 = registers[r1] & 0x1;
 			registers[r1] >>>= 1;
 			registers[r1] |= bit0 << 7;
@@ -3106,7 +3108,10 @@ public void setClockFreq() {
 		}
 
 		private void rotateRightCarry(int r1) {
-			clearFlags();
+			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT});
+			if (memory.readByte(pc - 1) == 0xCB)
+				resetFlag(FLAG_ZERO);
+
 			int bit0 = registers[r1] & 0x1;
 			registers[r1] >>>= 1;
 			registers[r1] |= getFlag(FLAG_CARRY) << 7;
@@ -3133,7 +3138,10 @@ public void setClockFreq() {
 		}
 
 		private void rotateRightCarryHL() {
+			int flagStat = getFlag(FLAG_CARRY);
 			clearFlags();
+			loadFlag(FLAG_CARRY, flagStat);
+
 			int tempByte = readHL();
 			int bit0 = tempByte & 0x1;
 			tempByte >>>= 1;
@@ -3265,11 +3273,11 @@ public void setClockFreq() {
 		}
 
 		private int pop() {
-			return memory.readByte(++sp);
+			return memory.readByte(sp++);
 		}
 
 		private void push(int data) {
-			memory.writeByte(sp--, data & 0xFF);
+			memory.writeByte(--sp, data & 0xFF);
 		}
 
 		private void swap(int r1) {
@@ -3512,15 +3520,12 @@ public void setClockFreq() {
 			interuptMasterEnable = true;
 			halted = false;
 			returnOP();
-			interuptMasterEnable = true;
 		}
 
 		private void halt() {
 			if (interuptMasterEnable) {
 				halted = true;
-			} else {
-				stopCounting = true;
-			}
+			} 
 		}
 
 	} //end class

@@ -31,20 +31,9 @@ public class gbScreen extends JPanel{
 		g2.drawImage(canvas, null, null);
 	}
 
-	private Color randomColor() {
-		return new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-	}
-
 	public void fillCanvas() {
-		for (int y = 0; y < canvas.getHeight(); y++) {
-			for (int x = 0; x < canvas.getWidth(); x++) {
-				/*gpu.tileSet[x][y][0] = 0 ;
-				gpu.tileSet[x][y][1] = 0 ;
-				gpu.tileSet[x][y][2] = 0 ;
-				int r = gpu.tileSet[x][y][0];
-				int g = gpu.tileSet[x][y][1];
-				int b = gpu.tileSet[x][y][2];
-				int col = (r << 16) | (g << 8) | b;*/
+		for (int y = 0; y < 144; y++) {
+			for (int x = 0; x < 160; x++) {
 				canvas.setRGB(x, y, gpu.tileSet[x][y]);
 				//if (!(gpu.cpu.memory._inBIOS))
 				//	System.out.println("x="+x+" y="+y+" colour="+gpu.tileSet[x][y]);
@@ -53,8 +42,6 @@ public class gbScreen extends JPanel{
 		repaint();
 	}
 
-	public void resetScreen(){
-
-	}
+	public void resetScreen(){}
 
 }
