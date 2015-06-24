@@ -49,7 +49,6 @@ public class Z80 {
 	boolean doReset = false;
 
 	public boolean halted;
-	boolean stopCounting;
 
 	int opCode;
 	int numCycles;
@@ -65,7 +64,7 @@ public class Z80 {
 		boolean step = false;
 		while (!doReset){
 			if (!halted){
-				/*if (pc ==0x0C)
+				/*if (pc ==0x3b8)
 					step =true;
 				if (step)
 					while (!(sc.nextLine().trim().isEmpty())){}*/
@@ -200,14 +199,12 @@ public class Z80 {
 	}
 
 	private void checkInterupts(){
-		if (interuptMasterEnable){
-			int req = memory.readByte(INTERUPT_REQUEST_REG);
-			int enab = memory.readByte(INTERUPT_ENABLED_REG);
-			for (int i = 0 ; i < 5; i++){
-				if (bitTest(req, i)){
-					if (bitTest(enab, i))
-						serviceInterupt(i);
-				}
+		int req = memory.readByte(INTERUPT_REQUEST_REG);
+		int enab = memory.readByte(INTERUPT_ENABLED_REG);
+		for (int i = 0 ; i < 5; i++){
+			if (bitTest(req, i)){
+				if (bitTest(enab, i))
+					serviceInterupt(i);
 			}
 		}
 	}
@@ -218,17 +215,18 @@ public class Z80 {
 		TIMER: 0x50
 		JOYPAD: 0x60 */
 		halted = false;
-		interuptMasterEnable = false;
-		memory.writeByte(INTERUPT_REQUEST_REG, bitReset(memory.readByte(INTERUPT_REQUEST_REG), bitNum));
 
-		push(hiWord(pc));
-		push(loWord(pc));
-
-		switch(bitNum){
-			case 0: pc = 0x40; break;
-			case 1: pc = 0x48; break;
-			case 2: pc = 0x50; break;
-			case 3: pc = 0x60; break;
+		if (interuptMasterEnable){
+			memory.writeByte(INTERUPT_REQUEST_REG, bitReset(memory.readByte(INTERUPT_REQUEST_REG), bitNum));
+			interuptMasterEnable = false;
+			push(hiWord(pc));
+			push(loWord(pc));	
+			switch(bitNum){
+				case 0: pc = 0x40; break;
+				case 1: pc = 0x48; break;
+				case 2: pc = 0x50; break;
+				case 3: pc = 0x60; break;
+			}
 		}
 
 		//System.out.println("Serving interrupt: " + bitNum);
@@ -440,7 +438,7 @@ public class Z80 {
 				}
 				case 0x4B:
 				{ //LD C,E
-					registers[REGISTER_C] = registers[REGISTER_D];
+					registers[REGISTER_C] = registers[REGISTER_E];
 					return 4;
 				}
 				case 0x4C:
@@ -455,7 +453,7 @@ public class Z80 {
 				}
 				case 0x4E:
 				{ //LD C,(HL)
-					registers[REGISTER_B] = readHL();
+					registers[REGISTER_C] = readHL();
 					return 8;
 				}
 				case 0x57:
@@ -565,17 +563,17 @@ public class Z80 {
 				}
 				case 0x64:
 				{ //LD H,H
-					registers[REGISTER_D] = registers[REGISTER_C];
+					registers[REGISTER_H] = registers[REGISTER_H];
 					return 4;
 				}
 				case 0x65:
 				{ //LD H,L
-					registers[REGISTER_D] = registers[REGISTER_C];
+					registers[REGISTER_H] = registers[REGISTER_L];
 					return 4;
 				}
 				case 0x66:
 				{ //LD H,(HL)
-					registers[REGISTER_D] = readHL();
+					registers[REGISTER_H] = readHL();
 					return 8;
 				}
 				case 0x6F:
@@ -753,14 +751,15 @@ public class Z80 {
 					int sum = sp + tempByte;
 					if (((sp & 0xFF) + (tempByte & 0xFF)) > 0xFF) setFlag(FLAG_HALFCARRY);
 					if (sum > 0xFFFF) setFlag(FLAG_CARRY);
-					if ((sum & 0xFFFF)==0) setFlag(FLAG_ZERO);
 					load(REGISTER_H, REGISTER_L, sum);
 					return 12;
 				}
 				case 0x08:
 				{ //LD (nn),SP
-					memory.writeByte(memory.readByte(pc++), sp >>> 8);
-					memory.writeByte(memory.readByte(pc++), sp & 0xFF);
+					tempByte = ((memory.readByte(pc + 1) << 8) | memory.readByte(pc)) & 0xFFFF;
+					memory.writeByte(tempByte + 1, sp >>> 8);
+					memory.writeByte(tempByte, sp & 0xFF);
+					pc += 2;
 					return 20;
 				}
 				case 0xF5:
@@ -861,7 +860,6 @@ public class Z80 {
 					adc(REGISTER_A, registers[REGISTER_A]);
 					return 4;
 				}
-
 				case 0x88:
 				{ //ADC A,B
 					adc(REGISTER_A, registers[REGISTER_B]);
@@ -952,7 +950,6 @@ public class Z80 {
 					sbc(REGISTER_A, registers[REGISTER_A]);
 					return 4;
 				}
-
 				case 0x98:
 				{ //SBC A,B
 					sbc(REGISTER_A, registers[REGISTER_B]);
@@ -1046,7 +1043,6 @@ public class Z80 {
 					or(REGISTER_A, registers[REGISTER_A]);
 					return 4;
 				}
-
 				case 0xB0:
 				{ //OR A,B
 					or(REGISTER_A, registers[REGISTER_B]);
@@ -1092,7 +1088,6 @@ public class Z80 {
 					xor(REGISTER_A, registers[REGISTER_A]);
 					return 4;
 				}
-
 				case 0xA8:
 				{ //XOR A,B
 					xor(REGISTER_A, registers[REGISTER_B]);
@@ -2653,11 +2648,11 @@ public class Z80 {
 					}
 					case 0x27:
 				{ //DAA 
-					/*if (getFlag(FLAG_HALFCARRY) == 1) add(REGISTER_A, 0x06);
+					if (getFlag(FLAG_HALFCARRY) == 1) add(REGISTER_A, 0x06);
 					if (getFlag(FLAG_CARRY) == 1) add(REGISTER_A, 0x60);
-					resetFlag(FLAG_HALFCARRY);*/
+					resetFlag(FLAG_HALFCARRY);
 
-					int highNibble = registers[REGISTER_A] >> 4;
+					/*int highNibble = registers[REGISTER_A] >> 4;
 					int lowNibble = registers[REGISTER_A] & 0x0F;
 					boolean _FC = true;
 					if (getFlag(FLAG_SUBTRACT)==1) {
@@ -2709,7 +2704,7 @@ public class Z80 {
 					if(registers[REGISTER_A] == 0)
 						setFlag(FLAG_ZERO);
 					else
-						resetFlag(FLAG_ZERO);
+						resetFlag(FLAG_ZERO);*/
 
 
 					return 4;
@@ -2893,7 +2888,7 @@ public class Z80 {
 					return 8;
 				}
 				case 0x38:
-				{ //JR cc,n
+				{ //JR C,n
 					jumpRelCC("C");
 					return 8;
 				}
@@ -3534,7 +3529,6 @@ public class Z80 {
 
 		private void reti() {
 			interuptMasterEnable = true;
-			halted = false;
 			returnOP();
 		}
 
