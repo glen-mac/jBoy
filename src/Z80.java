@@ -62,29 +62,33 @@ public class Z80 {
 	public void playCartridge() {
 		Scanner sc = new Scanner(System.in);
 		boolean step = false;
-		while (!doReset){
-			if (!halted){
+		try {
+			while (!doReset){
+				if (!halted){
 				/*if (pc ==0x3b8)
 					step =true;
 				if (step)
-					while (!(sc.nextLine().trim().isEmpty())){}*/
-				opCode = memory.readByte(pc++);
+				while (!(sc.nextLine().trim().isEmpty())){}*/
+					opCode = memory.readByte(pc++);
 				numCycles = execute(opCode);
 				updateTimers(numCycles);
 				graphics.updateGraphics(numCycles);
 				checkInterupts();
 			}
 		}
+	} catch (RuntimeException e) {
+		throw new RuntimeException(String.format("PC: %4x", pc), e);
 	}
+}
 
-	private boolean isClockEnabled() {
-		boolean result = false;
-		if (((memory.readByte(TIMER_CONTR) >>> 2) & 0x1) == 1) result = true;
-		return result;
-	}
+private boolean isClockEnabled() {
+	boolean result = false;
+	if (((memory.readByte(TIMER_CONTR) >>> 2) & 0x1) == 1) result = true;
+	return result;
+}
 
-	public void setClockFreq() {
-		switch (getClockFreq()) {
+public void setClockFreq() {
+	switch (getClockFreq()) {
 			case 0: timerCounter = 1024;	break; // freq 4096
 			case 1: timerCounter = 16;		break; // freq 262144
 			case 2:timerCounter = 64;		break; // freq 65536
@@ -2704,7 +2708,7 @@ public class Z80 {
 					if(registers[REGISTER_A] == 0)
 						setFlag(FLAG_ZERO);
 					else
-						resetFlag(FLAG_ZERO);*/
+					resetFlag(FLAG_ZERO);*/
 
 
 					return 4;
