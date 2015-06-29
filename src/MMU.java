@@ -203,33 +203,43 @@ public class MMU{
 			
 			case 0x0000:
 			case 0x1000:
-			//ramEnable(data); //System.out.println(" .. using ROM bank 0"); 
-			//break;
+			//ramEnable(data); 
+			System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Writing address 0x"+Integer.toHexString(addr).toUpperCase() + " | with data 0x" + Integer.toHexString(data).toUpperCase());
+			System.out.println(" .. using ROM bank 0"); 
+			break;
 			
 			//rom bank switch
 			case 0x2000:
 			case 0x3000:
-			//romBankLo(data); //System.out.println(" .. using ROM bank Lo switch"); 
-			//break;
+			//romBankLo(data); 
+			if (data != 1){
+			System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Writing address 0x"+Integer.toHexString(addr).toUpperCase() + " | with data 0x" + Integer.toHexString(data).toUpperCase());
+			System.out.println(" .. using ROM bank Lo switch"); 
+		}
+			break;
 
 			case 0x4000:
 			case 0x5000:
-			/*{
+			{
 				if (_memBankNum == 1){
 					if (_MBC1mode == 0){
-						romBankHi(data);
-						//System.out.println(" .. using ROM bank Hi switch");
+						//romBankHi(data);
+						System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Writing address 0x"+Integer.toHexString(addr).toUpperCase() + " | with data 0x" + Integer.toHexString(data).toUpperCase());
+						System.out.println(" .. using ROM bank Hi switch");
 					}
 					else{
-						ramBankSelect(data);
-						//System.out.println(" .. using RAM bank selecter");
+						//ramBankSelect(data);
+						System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Writing address 0x"+Integer.toHexString(addr).toUpperCase() + " | with data 0x" + Integer.toHexString(data).toUpperCase());
+						System.out.println(" .. using RAM bank selecter");
 					}
 				}
-			} break;*/
+			} break;
 
 			case 0x6000:
 			case 0x7000:
-			//memoryModelSelect(data); //System.out.println(" .. using memory model select"); 
+			//memoryModelSelect(data); 
+			System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Writing address 0x"+Integer.toHexString(addr).toUpperCase() + " | with data 0x" + Integer.toHexString(data).toUpperCase());
+			System.out.println(" .. using memory model select"); 
 			break;
 
 			case 0x8000:
@@ -241,7 +251,7 @@ public class MMU{
 			case 0xB000:
 			//catridgeRAM[(addr - 0xA000) + (_ramBank * 0x2000)] = (short) data; 
 			catridgeRAM[(addr - 0xA000)] = (short) data; 
-			//System.out.println(" .. using cartRAM bank"); 
+			System.out.println(" .. using cartRAM bank"); 
 			break;
 			
 			case 0xC000:
