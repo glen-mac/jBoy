@@ -275,2916 +275,1652 @@ public void setClockFreq() {
 		//System.out.println("PC = 0x" + Integer.toHexString(pc - 1) + " | Performing OPCode 0x"+Integer.toHexString(opCode).toUpperCase());
 		int tempByte;
 
-		switch (opCode) {
-			case 0x00:
-				{ //NOP					
-					return 4;
-				}
-				case 0xFD:
-				{ // no operation				
-					return 4;
-				}
-				case 0x3E:
-				{ //LD A,n
-					registers[REGISTER_A] = memory.readByte(pc++);
-					return 8;
-				}
-				case 0x06:
-				{ //LD B,n
-					registers[REGISTER_B] = memory.readByte(pc++);
-					return 8;
-				}
-				case 0x0E:
-				{ //LD C,n
-					registers[REGISTER_C] = memory.readByte(pc++);
-					return 8;
-				}
-				case 0x16:
-				{ //LD D,n
-					registers[REGISTER_D] = memory.readByte(pc++);
-					return 8;
-				}
-				case 0x1E:
-				{ //LD E,n
-					registers[REGISTER_E] = memory.readByte(pc++);
-					return 8;
-				}
-				case 0x26:
-				{ //LD H,n
-					registers[REGISTER_H] = memory.readByte(pc++);
-					return 8;
-				}
-				case 0x2E:
-				{ //LD L,n
-					registers[REGISTER_L] = memory.readByte(pc++);
-					return 8;
-				}
-				case 0x7F:
-				{ //LD A,A
-					registers[REGISTER_A] = registers[REGISTER_A];
-					return 4;
-				}
-				case 0x78:
-				{ //LD A,B
-					registers[REGISTER_A] = registers[REGISTER_B];
-					return 4;
-				}
-				case 0x79:
-				{ //LD A,C
-					registers[REGISTER_A] = registers[REGISTER_C];
-					return 4;
-				}
-				case 0xF2:
-				{ //LD A,(C)
-					registers[REGISTER_A] = memory.readByte(0xFF00 + registers[REGISTER_C]);
-					return 8;
-				}
-				case 0x7A:
-				{ //LD A,D
-					registers[REGISTER_A] = registers[REGISTER_D];
-					return 4;
-				}
-				case 0x7B:
-				{ //LD A,E
-					registers[REGISTER_A] = registers[REGISTER_E];
-					return 4;
-				}
-				case 0x7C:
-				{ //LD A,H
-					registers[REGISTER_A] = registers[REGISTER_H];
-					return 4;
-				}
-				case 0x7D:
-				{ //LD A,L
-					registers[REGISTER_A] = registers[REGISTER_L];
-					return 4;
-				}
-				case 0x0A:
-				{ //LD A,(BC)
-					registers[REGISTER_A] = memory.readByte((registers[REGISTER_B]) << 8 | (registers[REGISTER_C]));
-					return 8;
-				}
-				case 0x1A:
-				{ //LD A,(DE)
-					registers[REGISTER_A] = memory.readByte((registers[REGISTER_D]) << 8 | (registers[REGISTER_E]));
-					return 8;
-				}
-				case 0x7E:
-				{ //LD A,(HL)
-					registers[REGISTER_A] = memory.readByte((registers[REGISTER_H] << 8) | (registers[REGISTER_L]));
-					return 8;
-				}
-				case 0xFA:
-				{ //LD A,(nn)
-					registers[REGISTER_A] = memory.readByte((memory.readByte(pc + 1) << 8) | memory.readByte(pc));
-					pc += 2;
-					return 16;
-				}
-				case 0x47:
-				{ //LD B,A
-					registers[REGISTER_B] = registers[REGISTER_A];
-					return 4;
-				}
-				case 0x40:
-				{ //LD B,B
-					registers[REGISTER_B] = registers[REGISTER_B];
-					return 4;
-				}
-				case 0x41:
-				{ //LD B,C
-					registers[REGISTER_B] = registers[REGISTER_C];
-					return 4;
-				}
-				case 0x42:
-				{ //LD B,D
-					registers[REGISTER_B] = registers[REGISTER_D];
-					return 4;
-				}
-				case 0x43:
-				{ //LD B,E
-					registers[REGISTER_B] = registers[REGISTER_E];
-					return 4;
-				}
-				case 0x44:
-				{ //LD B,H
-					registers[REGISTER_B] = registers[REGISTER_H];
-					return 4;
-				}
-				case 0x45:
-				{ //LD B,L
-					registers[REGISTER_B] = registers[REGISTER_L];
-					return 4;
-				}
-				case 0x46:
-				{ //LD B,(HL)
-					registers[REGISTER_B] = readHL();
-					return 8;
-				}
-				case 0x4F:
-				{ //LD C,A
-					registers[REGISTER_C] = registers[REGISTER_A];
-					return 4;
-				}
-				case 0x48:
-				{ //LD C,B
-					registers[REGISTER_C] = registers[REGISTER_B];
-					return 4;
-				}
-				case 0x49:
-				{ //LD C,C
-					registers[REGISTER_C] = registers[REGISTER_C];
-					return 4;
-				}
-				case 0x4A:
-				{ //LD C,D
-					registers[REGISTER_C] = registers[REGISTER_D];
-					return 4;
-				}
-				case 0x4B:
-				{ //LD C,E
-					registers[REGISTER_C] = registers[REGISTER_E];
-					return 4;
-				}
-				case 0x4C:
-				{ //LD C,H
-					registers[REGISTER_C] = registers[REGISTER_H];
-					return 4;
-				}
-				case 0x4D:
-				{ //LD C,L
-					registers[REGISTER_C] = registers[REGISTER_L];
-					return 4;
-				}
-				case 0x4E:
-				{ //LD C,(HL)
-					registers[REGISTER_C] = readHL();
-					return 8;
-				}
-				case 0x57:
-				{ //LD D,A
-					registers[REGISTER_D] = registers[REGISTER_A];
-					return 4;
-				}
-				case 0x50:
-				{ //LD D,B
-					registers[REGISTER_D] = registers[REGISTER_B];
-					return 4;
-				}
-				case 0x51:
-				{ //LD D,C
-					registers[REGISTER_D] = registers[REGISTER_C];
-					return 4;
-				}
-				case 0x52:
-				{ //LD D,D
-					registers[REGISTER_D] = registers[REGISTER_D];
-					return 4;
-				}
-				case 0x53:
-				{ //LD D,E
-					registers[REGISTER_D] = registers[REGISTER_E];
-					return 4;
-				}
-				case 0x54:
-				{ //LD D,H
-					registers[REGISTER_D] = registers[REGISTER_H];
-					return 4;
-				}
-				case 0x55:
-				{ //LD D,L
-					registers[REGISTER_D] = registers[REGISTER_L];
-					return 4;
-				}
-				case 0x56:
-				{ //LD D,(HL)
-					registers[REGISTER_D] = readHL();
-					return 8;
-				}
-				case 0x5F:
-				{ //LD E,A
-					registers[REGISTER_E] = registers[REGISTER_A];
-					return 4;
-				}
-				case 0x58:
-				{ //LD E,B
-					registers[REGISTER_E] = registers[REGISTER_B];
-					return 4;
-				}
-				case 0x59:
-				{ //LD E,C
-					registers[REGISTER_E] = registers[REGISTER_C];
-					return 4;
-				}
-				case 0x5A:
-				{ //LD E,D
-					registers[REGISTER_E] = registers[REGISTER_D];
-					return 4;
-				}
-				case 0x5B:
-				{ //LD E,E
-					registers[REGISTER_E] = registers[REGISTER_E];
-					return 4;
-				}
-				case 0x5C:
-				{ //LD E,H
-					registers[REGISTER_E] = registers[REGISTER_H];
-					return 4;
-				}
-				case 0x5D:
-				{ //LD E,L
-					registers[REGISTER_E] = registers[REGISTER_L];
-					return 4;
-				}
-				case 0x5E:
-				{ //LD E,(HL)
-					registers[REGISTER_E] = readHL();
-					return 8;
-				}
-				case 0x67:
-				{ //LD H,A
-					registers[REGISTER_H] = registers[REGISTER_A];
-					return 4;
-				}
-				case 0x60:
-				{ //LD H,B
-					registers[REGISTER_H] = registers[REGISTER_B];
-					return 4;
-				}
-				case 0x61:
-				{ //LD H,C
-					registers[REGISTER_H] = registers[REGISTER_C];
-					return 4;
-				}
-				case 0x62:
-				{ //LD H,D
-					registers[REGISTER_H] = registers[REGISTER_D];
-					return 4;
-				}
-				case 0x63:
-				{ //LD H,E
-					registers[REGISTER_H] = registers[REGISTER_E];
-					return 4;
-				}
-				case 0x64:
-				{ //LD H,H
-					registers[REGISTER_H] = registers[REGISTER_H];
-					return 4;
-				}
-				case 0x65:
-				{ //LD H,L
-					registers[REGISTER_H] = registers[REGISTER_L];
-					return 4;
-				}
-				case 0x66:
-				{ //LD H,(HL)
-					registers[REGISTER_H] = readHL();
-					return 8;
-				}
-				case 0x6F:
-				{ //LD L,A
-					registers[REGISTER_L] = registers[REGISTER_A];
-					return 4;
-				}
-				case 0x68:
-				{ //LD L,B
-					registers[REGISTER_L] = registers[REGISTER_B];
-					return 4;
-				}
-				case 0x69:
-				{ //LD L,C
-					registers[REGISTER_L] = registers[REGISTER_C];
-					return 4;
-				}
-				case 0x6A:
-				{ //LD L,D
-					registers[REGISTER_L] = registers[REGISTER_D];
-					return 4;
-				}
-				case 0x6B:
-				{ //LD L,E
-					registers[REGISTER_L] = registers[REGISTER_E];
-					return 4;
-				}
-				case 0x6C:
-				{ //LD L,H
-					registers[REGISTER_L] = registers[REGISTER_H];
-					return 4;
-				}
-				case 0x6D:
-				{ //LD L,L
-					registers[REGISTER_L] = registers[REGISTER_L];
-					return 4;
-				}
-				case 0x6E:
-				{ //LD L,(HL)
-					registers[REGISTER_L] = readHL();
-					return 8;
-				}
-				case 0x77:
-				{ //LD (HL),A
-					writeHL(registers[REGISTER_A]);
-					return 8;
-				}
-				case 0x70:
-				{ //LD (HL),B
-					writeHL(registers[REGISTER_B]);
-					return 8;
-				}
-				case 0x71:
-				{ //LD (HL),C
-					writeHL(registers[REGISTER_C]);
-					return 8;
-				}
-				case 0x72:
-				{ //LD (HL),D
-					writeHL(registers[REGISTER_D]);
-					return 8;
-				}
-				case 0x73:
-				{ //LD (HL),E
-					writeHL(registers[REGISTER_E]);
-					return 8;
-				}
-				case 0x74:
-				{ //LD (HL),H
-					writeHL(registers[REGISTER_H]);
-					return 8;
-				}
-				case 0x75:
-				{ //LD (HL),L
-					writeHL(registers[REGISTER_L]);
-					return 8;
-				}
-				case 0x36:
-				{ //LD (HL),n
-					writeHL(memory.readByte(pc++));
-					return 12;
-				}
-				case 0x02:
-				{ //LD (BC),A
-					memory.writeByte(combine(REGISTER_B, REGISTER_C), registers[REGISTER_A]);
-					return 8;
-				}
-				case 0x12:
-				{ //LD (DE),A
-					memory.writeByte(combine(REGISTER_D, REGISTER_E), registers[REGISTER_A]);
-					return 8;
-				}
-				case 0xEA:
-				{ //LD (nn),A
-					memory.writeByte((memory.readByte(pc + 1) << 8 | memory.readByte(pc)), registers[REGISTER_A]);
-					pc += 2;
-					return 16;
-				}
-				case 0xE2:
-				{ //LD (C),A
-					memory.writeByte((0xFF00 + registers[REGISTER_C]), registers[REGISTER_A]);
-					return 8;
-				}
-				case 0x3A:
-				{ //LD A,(HLD) | LD A,(HL-) | LDD A,(HL)
-					registers[REGISTER_A] = readHL();
-					dec(REGISTER_H, REGISTER_L);
-					return 8;
-				}
-				case 0x32:
-				{ //LD (HLD),A | LD (HL-),A | LDD (HL),A
-					writeHL(registers[REGISTER_A]);
-					dec(REGISTER_H, REGISTER_L);
-					return 8;
-				}
-				case 0x2A:
-				{ //LD A,(HLI) | LD A,(HL+) | LDD A,(HL)
-					registers[REGISTER_A] = readHL();
-					inc(REGISTER_H, REGISTER_L);
-					return 8;
-				}
-				case 0x22:
-				{ //LD (HLI),A | LD (HL+),A | LDD (HL),A
-					writeHL(registers[REGISTER_A]);
-					inc(REGISTER_H, REGISTER_L);
-					return 8;
-				}
-				case 0xE0:
-				{ //LDH (n),A
-					memory.writeByte(0xFF00 + memory.readByte(pc++), registers[REGISTER_A]);
-					return 12;
-				}
-				case 0xF0:
-				{ //LDH A,(n)
-					registers[REGISTER_A] = memory.readByte(0xFF00 + memory.readByte(pc++));
-					return 12;
-				}
-				case 0x01:
-				{ //LD BC,nn
-					int data = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
-					load(REGISTER_B, REGISTER_C, data & 0xFFFF);
-					pc += 2;
-					return 12;
-				}
-				case 0x11:
-				{ //LD DE,nn
-					int data = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
-					load(REGISTER_D, REGISTER_E, data & 0xFFFF);
-					pc += 2;
-					return 12;
-				}
-				case 0x21:
-				{ //LD HL,nn
-					int data = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
-					load(REGISTER_H, REGISTER_L, data & 0xFFFF);
-					pc += 2;
-					return 12;
-				}
-				case 0x31:
-				{ //LD SP,nn
-					int data = (memory.readByte(pc + 1) << 8) | memory.readByte(pc);
-					sp = data & 0xFFFF;
-					pc += 2;
-					return 12;
-				}
-				case 0xF9:
-				{ //LD SP,HL
-					sp = combine(REGISTER_H, REGISTER_L);
-					return 8;
-				}
-				case 0xF8:
-				{ //LDHL SP,n
-					clearFlags();
-					tempByte = (byte) memory.readByte(pc++);
-					int sum = sp + tempByte;
-					if (((sp & 0xFF) + (tempByte & 0xFF)) > 0xFF) setFlag(FLAG_HALFCARRY);
-					if (sum > 0xFFFF) setFlag(FLAG_CARRY);
-					load(REGISTER_H, REGISTER_L, sum);
-					return 12;
-				}
-				case 0x08:
-				{ //LD (nn),SP
-					tempByte = ((memory.readByte(pc + 1) << 8) | memory.readByte(pc)) & 0xFFFF;
-					memory.writeByte(tempByte + 1, sp >>> 8);
-					memory.writeByte(tempByte, sp & 0xFF);
-					pc += 2;
-					return 20;
-				}
-				case 0xF5:
-				{ //PUSH AF
-					push(registers[REGISTER_A]);
-					push(registers[REGISTER_F]);
-					return 16;
-				}
-				case 0xC5:
-				{ //PUSH BC
-					push(registers[REGISTER_B]);
-					push(registers[REGISTER_C]);
-					return 16;
-				}
-				case 0xD5:
-				{ //PUSH DE
-					push(registers[REGISTER_D]);
-					push(registers[REGISTER_E]);
-					return 16;
-				}
-				case 0xE5:
-				{ //PUSH HL
-					push(registers[REGISTER_H]);
-					push(registers[REGISTER_L]);
-					return 16;
-				}
-				case 0xF1:
-				{ //POP AF
-					registers[REGISTER_F] = pop();
-					registers[REGISTER_A] = pop();
-					return 12;
-				}
-				case 0xC1:
-				{ //POP BC
-					registers[REGISTER_C] = pop();
-					registers[REGISTER_B] = pop();
-					return 12;
-				}
-				case 0xD1:
-				{ //POP DE
-					registers[REGISTER_E] = pop();
-					registers[REGISTER_D] = pop();
-					return 12;
-				}
-				case 0xE1:
-				{ //POP HL
-					registers[REGISTER_L] = pop();
-					registers[REGISTER_H] = pop();
-					return 12;
-				}
-				case 0x87:
-				{ //ADD A,A
-					add(REGISTER_A, registers[REGISTER_A]);
-					return 4;
-				}
-				case 0x80:
-				{ //ADD A,B
-					add(REGISTER_A, registers[REGISTER_B]);
-					return 4;
-				}
-				case 0x81:
-				{ //ADD A,C
-					add(REGISTER_A, registers[REGISTER_C]);
-					return 4;
-				}
-				case 0x82:
-				{ //ADD A,D
-					add(REGISTER_A, registers[REGISTER_D]);
-					return 4;
-				}
-				case 0x83:
-				{ //ADD A,E
-					add(REGISTER_A, registers[REGISTER_E]);
-					return 4;
-				}
-				case 0x84:
-				{ //ADD A,H
-					add(REGISTER_A, registers[REGISTER_H]);
-					return 4;
-				}
-				case 0x85:
-				{ //ADD A,L
-					add(REGISTER_A, registers[REGISTER_L]);
-					return 4;
-				}
-				case 0x86:
-				{ //ADD A,(HL)
-					add(REGISTER_A, readHL());
-					return 8;
-				}
-				case 0xC6:
-				{ //ADD A,#
-					add(REGISTER_A, memory.readByte(pc++));
-					return 8;
-				}
-				case 0x8F:
-				{ //ADC A,A
-					adc(REGISTER_A, registers[REGISTER_A]);
-					return 4;
-				}
-				case 0x88:
-				{ //ADC A,B
-					adc(REGISTER_A, registers[REGISTER_B]);
-					return 4;
-				}
-				case 0x89:
-				{ //ADC A,C
-					adc(REGISTER_A, registers[REGISTER_C]);
-					return 4;
-				}
-				case 0x8A:
-				{ //ADC A,D
-					adc(REGISTER_A, registers[REGISTER_D]);
-					return 4;
-				}
-				case 0x8B:
-				{ //ADC A,E
-					adc(REGISTER_A, registers[REGISTER_E]);
-					return 4;
-				}
-				case 0x8C:
-				{ //ADC A,H
-					adc(REGISTER_A, registers[REGISTER_H]);
-					return 4;
-				}
-				case 0x8D:
-				{ //ADC A,L
-					adc(REGISTER_A, registers[REGISTER_L]);
-					return 4;
-				}
-				case 0x8E:
-				{ //ADC A,(HL)
-					adc(REGISTER_A, readHL());
-					return 8;
-				}
-				case 0xCE:
-				{ //ADC A,#
-					adc(REGISTER_A, memory.readByte(pc++));
-					return 8;
-				}
-				case 0x97:
-				{ //SUB A,A
-					sub(REGISTER_A, registers[REGISTER_A]);
-					return 4;
-				}
-				case 0x90:
-				{ //SUB A,B
-					sub(REGISTER_A, registers[REGISTER_B]);
-					return 4;
-				}
-				case 0x91:
-				{ //SUB A,C
-					sub(REGISTER_A, registers[REGISTER_C]);
-					return 4;
-				}
-				case 0x92:
-				{ //SUB A,D
-					sub(REGISTER_A, registers[REGISTER_D]);
-					return 4;
-				}
-				case 0x93:
-				{ //SUB A,E
-					sub(REGISTER_A, registers[REGISTER_E]);
-					return 4;
-				}
-				case 0x94:
-				{ //SUB A,H
-					sub(REGISTER_A, registers[REGISTER_H]);
-					return 4;
-				}
-				case 0x95:
-				{ //SUB A,L
-					sub(REGISTER_A, registers[REGISTER_L]);
-					return 4;
-				}
-				case 0x96:
-				{ //SUB A,(HL)
-					sub(REGISTER_A, readHL());
-					return 8;
-				}
-				case 0xD6:
-				{ //SUB A,#
-					sub(REGISTER_A, memory.readByte(pc++));
-					return 8;
-				}
-				case 0x9F:
-				{ //SBC A,A
-					sbc(REGISTER_A, registers[REGISTER_A]);
-					return 4;
-				}
-				case 0x98:
-				{ //SBC A,B
-					sbc(REGISTER_A, registers[REGISTER_B]);
-					return 4;
-				}
-				case 0x99:
-				{ //SBC A,C
-					sbc(REGISTER_A, registers[REGISTER_C]);
-					return 4;
-				}
-				case 0x9A:
-				{ //SBC A,D
-					sbc(REGISTER_A, registers[REGISTER_D]);
-					return 4;
-				}
-				case 0x9B:
-				{ //SBC A,E
-					sbc(REGISTER_A, registers[REGISTER_E]);
-					return 4;
-				}
-				case 0x9C:
-				{ //SBC A,H
-					sbc(REGISTER_A, registers[REGISTER_H]);
-					return 4;
-				}
-				case 0x9D:
-				{ //SBC A,L
-					sbc(REGISTER_A, registers[REGISTER_L]);
-					return 4;
-				}
-				case 0x9E:
-				{ //SBC A,(HL)
-					sbc(REGISTER_A, readHL());
-					return 8;
-				}
-				// case 0xXX:	{	//SBC A,#
-				// 	registers[REGISTER_A] -= memory.readByte(pc++);
-				// 	if(registers[REGISTER_A] == 0)
-				// 		setFlag(FLAG_ZERO);
-				// 	setFlag(FLAG_SUBTRACT);
-				// 	//carry flags??????????
-				// 	return X;
-				// }
-				case 0xA7:
-				{ //AND A,A
-					and(REGISTER_A, registers[REGISTER_A]);
-					return 4;
-				}
-				case 0xA0:
-				{ //AND A,B
-					and(REGISTER_A, registers[REGISTER_B]);
-					return 4;
-				}
-				case 0xA1:
-				{ //AND A,C
-					and(REGISTER_A, registers[REGISTER_C]);
-					return 4;
-				}
-				case 0xA2:
-				{ //AND A,D
-					and(REGISTER_A, registers[REGISTER_D]);
-					return 4;
-				}
-				case 0xA3:
-				{ //AND A,E
-					and(REGISTER_A, registers[REGISTER_E]);
-					return 4;
-				}
-				case 0xA4:
-				{ //AND A,H
-					and(REGISTER_A, registers[REGISTER_H]);
-					return 4;
-				}
-				case 0xA5:
-				{ //AND A,L
-					and(REGISTER_A, registers[REGISTER_L]);
-					return 4;
-				}
-				case 0xA6:
-				{ //AND A,(HL)
-					and(REGISTER_A, readHL());
-					return 8;
-				}
-				case 0xE6:
-				{ //AND A,#
-					and(REGISTER_A, memory.readByte(pc++));
-					return 8;
-				}
-				case 0xB7:
-				{ //OR A,A
-					or(REGISTER_A, registers[REGISTER_A]);
-					return 4;
-				}
-				case 0xB0:
-				{ //OR A,B
-					or(REGISTER_A, registers[REGISTER_B]);
-					return 4;
-				}
-				case 0xB1:
-				{ //OR A,C
-					or(REGISTER_A, registers[REGISTER_C]);
-					return 4;
-				}
-				case 0xB2:
-				{ //OR A,D
-					or(REGISTER_A, registers[REGISTER_D]);
-					return 4;
-				}
-				case 0xB3:
-				{ //OR A,E
-					or(REGISTER_A, registers[REGISTER_E]);
-					return 4;
-				}
-				case 0xB4:
-				{ //OR A,H
-					or(REGISTER_A, registers[REGISTER_H]);
-					return 4;
-				}
-				case 0xB5:
-				{ //OR A,L
-					or(REGISTER_A, registers[REGISTER_L]);
-					return 4;
-				}
-				case 0xB6:
-				{ //OR A,(HL)
-					or(REGISTER_A, readHL());
-					return 8;
-				}
-				case 0xF6:
-				{ //OR A,#
-					or(REGISTER_A, memory.readByte(pc++));
-					return 8;
-				}
-				case 0xAF:
-				{ //XOR A,A
-					xor(REGISTER_A, registers[REGISTER_A]);
-					return 4;
-				}
-				case 0xA8:
-				{ //XOR A,B
-					xor(REGISTER_A, registers[REGISTER_B]);
-					return 4;
-				}
-				case 0xA9:
-				{ //XOR A,C
-					xor(REGISTER_A, registers[REGISTER_C]);
-					return 4;
-				}
-				case 0xAA:
-				{ //XOR A,D
-					xor(REGISTER_A, registers[REGISTER_D]);
-					return 4;
-				}
-				case 0xAB:
-				{ //XOR A,E
-					xor(REGISTER_A, registers[REGISTER_E]);
-					return 4;
-				}
-				case 0xAC:
-				{ //XOR A,H
-					xor(REGISTER_A, registers[REGISTER_H]);
-					return 4;
-				}
-				case 0xAD:
-				{ //XOR A,L
-					xor(REGISTER_A, registers[REGISTER_L]);
-					return 4;
-				}
-				case 0xAE:
-				{ //XOR A,(HL)
-					xor(REGISTER_A, readHL());
-					return 8;
-				}
-				case 0xEE:
-				{ //XOR A,#
-					xor(REGISTER_A, memory.readByte(pc++));
-					return 8;
-				}
-				case 0xBF:
-				{ //CP A,A
-					compare(REGISTER_A, registers[REGISTER_A]);
-					return 4;
-				}
-				case 0xB8:
-				{ //CP A,B
-					compare(REGISTER_A, registers[REGISTER_B]);
-					return 4;
-				}
-				case 0xB9:
-				{ //CP A,C
-					compare(REGISTER_A, registers[REGISTER_C]);
-					return 4;
-				}
-				case 0xBA:
-				{ //CP A,D
-					compare(REGISTER_A, registers[REGISTER_D]);
-					return 4;
-				}
-				case 0xBB:
-				{ //CP A,E
-					compare(REGISTER_A, registers[REGISTER_E]);
-					return 4;
-				}
-				case 0xBC:
-				{ //CP A,H
-					compare(REGISTER_A, registers[REGISTER_H]);
-					return 4;
-				}
-				case 0xBD:
-				{ //CP A,L
-					compare(REGISTER_A, registers[REGISTER_L]);
-					return 4;
-				}
-				case 0xBE:
-				{ //CP A,(HL)
-					compare(REGISTER_A, readHL());
-					return 8;
-				}
-				case 0xFE:
-				{ //CP A,#
-					compare(REGISTER_A, memory.readByte(pc++));
-					return 8;
-				}
-				case 0x3C:
-				{ //INC A
-					inc(REGISTER_A);
-					return 4;
-				}
-				case 0x04:
-				{ //INC B
-					inc(REGISTER_B);
-					return 4;
-				}
-				case 0x0C:
-				{ //INC C
-					inc(REGISTER_C);
-					return 4;
-				}
-				case 0x14:
-				{ //INC D
-					inc(REGISTER_D);
-					return 4;
-				}
-				case 0x1C:
-				{ //INC E
-					inc(REGISTER_E);
-					return 4;
-				}
-				case 0x24:
-				{ //INC H
-					inc(REGISTER_H);
-					return 4;
-				}
-				case 0x2C:
-				{ //INC L
-					inc(REGISTER_L);
-					return 4;
-				}
-				case 0x34:
-				{ //INC (HL)
-					resetFlag(FLAG_SUBTRACT);
-					resetFlag(FLAG_ZERO);
-					resetFlag(FLAG_HALFCARRY);
-					tempByte = readHL();
-					switch (tempByte) {
-						case 0xFF:
-						setFlag(FLAG_HALFCARRY);
-						setFlag(FLAG_ZERO);
-						writeHL(0x00);
-						break;
-						case 0x0F:
-						setFlag(FLAG_HALFCARRY);
-						writeHL(0x10);
-						break;
-						default:
-						writeHL(tempByte++);
-						break;
-					}
-					return 12;
-				}
-				case 0x3D:
-				{ //DEC A
-					dec(REGISTER_A);
-					return 4;
-				}
-				case 0x05:
-				{ //DEC B
-					dec(REGISTER_B);
-					return 4;
-				}
-				case 0x0D:
-				{ //DEC C
-					dec(REGISTER_C);
-					return 4;
-				}
-				case 0x15:
-				{ //DEC D
-					dec(REGISTER_D);
-					return 4;
-				}
-				case 0x1D:
-				{ //DEC E
-					dec(REGISTER_E);
-					return 4;
-				}
-				case 0x25:
-				{ //DEC H
-					dec(REGISTER_H);
-					return 4;
-				}
-				case 0x2D:
-				{ //DEC L
-					dec(REGISTER_L);
-					return 4;
-				}
-				case 0x35:
-				{ //DEC (HL)
-					setFlag(FLAG_SUBTRACT);
-					resetFlag(FLAG_ZERO);
-					resetFlag(FLAG_HALFCARRY);
-					tempByte = readHL();
-					switch (tempByte) {
-						case 0x00:
-						setFlag(FLAG_HALFCARRY);
-						writeHL(0xFF);
-						break;
-						case 0x10:
-						setFlag(FLAG_HALFCARRY);
-						writeHL(0x0F);
-						break;
-						case 0x01:
-						setFlag(FLAG_ZERO);
-						writeHL(0x00);
-						break;
-						default:
-						writeHL(tempByte--);
-						break;
-					}
-					return 12;
-				}
-				case 0x09:
-				{ //ADD HL,BC
-					addHL(combine(REGISTER_B, REGISTER_C));
-					return 8;
-				}
-				case 0x19:
-				{ //ADD HL,DE
-					addHL(combine(REGISTER_D, REGISTER_E));
-					return 8;
-				}
-				case 0x29:
-				{ //ADD HL,HL
-					addHL(combine(REGISTER_H, REGISTER_L));
-					return 8;
-				}
-				case 0x39:
-				{ //ADD HL,SP
-					addHL(sp);
-					return 8;
-				}
-				case 0xE8:
-				{ //ADD SP,#
-					clearFlags();
-					tempByte = (byte) memory.readByte(pc++);
-					int sum = sp + tempByte;
-					if (((sp & 0xFF) + (tempByte & 0xFF)) > 0xFF) setFlag(FLAG_HALFCARRY);
-					if (sum > 0xFFFF) setFlag(FLAG_CARRY);
-					sp = sum & 0xFFFF;
-					return 16;
-				}
-				case 0x03:
-				{ //INC BC
-					inc(REGISTER_B, REGISTER_C);
-					return 8;
-				}
-				case 0x13:
-				{ //INC DE
-					inc(REGISTER_D, REGISTER_E);
-					return 8;
-				}
-				case 0x23:
-				{ //INC HL
-					inc(REGISTER_H, REGISTER_L);
-					return 8;
-				}
-				case 0x33:
-				{ //INC SP
-					sp = (sp + 1) & 0xFFFF;
-					return 8;
-				}
-				case 0x0B:
-				{ //DEC BC
-					dec(REGISTER_B, REGISTER_C);
-					return 8;
-				}
-				case 0x1B:
-				{ //DEC DE
-					dec(REGISTER_D, REGISTER_E);
-					return 8;
-				}
-				case 0x2B:
-				{ //DEC HL
-					dec(REGISTER_H, REGISTER_L);
-					return 8;
-				}
-				case 0x3B:
-				{ //DEC SP
-					sp = (sp - 1) & 0xFFFF;
-					return 8;
-				}
-				case 0xCB:
-				{ //SWAP n | RLC n | RL n
-					//System.out.println("PC = 0x" + Integer.toHexString(pc) + " | Performing Sub-OPCode 0x"+Integer.toHexString(memory.readByte(pc)).toUpperCase());
-					switch (memory.readByte(pc++)) {
-						case 0x37:
-							{ //SWAP A
-								swap(REGISTER_A);
-								return 8;
-							}
-							case 0x30:
-							{ //SWAP B
-								swap(REGISTER_B);
-								return 8;
-							}
-							case 0x31:
-							{ //SWAP C
-								swap(REGISTER_C);
-								return 8;
-							}
-							case 0x32:
-							{ //SWAP D
-								swap(REGISTER_D);
-								return 8;
-							}
-							case 0x33:
-							{ //SWAP E
-								swap(REGISTER_E);
-								return 8;
-							}
-							case 0x34:
-							{ //SWAP H
-								swap(REGISTER_H);
-								return 8;
-							}
-							case 0x35:
-							{ //SWAP L
-								swap(REGISTER_L);
-								return 8;
-							}
-							case 0x36:
-							{ //SWAP (HL)
-								swapHL();
-								return 16;
-							}
-							case 0x07:
-							{ //RLC A
-								rotateLeft(REGISTER_A);
-								return 8;
-							}
-							case 0x00:
-							{ //RLC B
-								rotateLeft(REGISTER_B);
-								return 8;
-							}
-							case 0x01:
-							{ //RLC C
-								rotateLeft(REGISTER_C);
-								return 8;
-							}
-							case 0x02:
-							{ //RLC D
-								rotateLeft(REGISTER_D);
-								return 8;
-							}
-							case 0x03:
-							{ //RLC E
-								rotateLeft(REGISTER_E);
-								return 8;
-							}
-							case 0x04:
-							{ //RLC H
-								rotateLeft(REGISTER_H);
-								return 8;
-							}
-							case 0x05:
-							{ //RLC L
-								rotateLeft(REGISTER_L);
-								return 8;
-							}
-							case 0x06:
-							{ //RLC (HL)
-								rotateLeftHL();
-								return 16;
-							}
-							case 0x17:
-							{ //RL A
-								rotateLeftCarry(REGISTER_A);
-								return 8;
-							}
-							case 0x10:
-							{ //RL B
-								rotateLeftCarry(REGISTER_B);
-								return 8;
-							}
-							case 0x11:
-							{ //RL C
-								rotateLeftCarry(REGISTER_C);
-								return 8;
-							}
-							case 0x12:
-							{ //RL D
-								rotateLeftCarry(REGISTER_D);
-								return 8;
-							}
-							case 0x13:
-							{ //RL E
-								rotateLeftCarry(REGISTER_E);
-								return 8;
-							}
-							case 0x14:
-							{ //RL H
-								rotateLeftCarry(REGISTER_H);
-								return 8;
-							}
-							case 0x15:
-							{ //RL L
-								rotateLeftCarry(REGISTER_L);
-								return 8;
-							}
-							case 0x16:
-							{ //RL (HL)
-								rotateLeftCarryHL();
-								return 16;
-							}
-							case 0x0F:
-							{ //RRC A
-								rotateRight(REGISTER_A);
-								return 8;
-							}
-							case 0x08:
-							{ //RRC B
-								rotateRight(REGISTER_B);
-								return 8;
-							}
-							case 0x09:
-							{ //RRC C
-								rotateRight(REGISTER_C);
-								return 8;
-							}
-							case 0x0A:
-							{ //RRC D
-								rotateRight(REGISTER_D);
-								return 8;
-							}
-							case 0x0B:
-							{ //RRC E
-								rotateRight(REGISTER_E);
-								return 8;
-							}
-							case 0x0C:
-							{ //RRC H
-								rotateRight(REGISTER_H);
-								return 8;
-							}
-							case 0x0D:
-							{ //RRC L
-								rotateRight(REGISTER_L);
-								return 8;
-							}
-							case 0x0E:
-							{ //RRC (HL)
-								rotateRightHL();
-								return 16;
-							}
-							case 0x1F:
-							{ //RR A
-								rotateRightCarry(REGISTER_A);
-								return 8;
-							}
-							case 0x18:
-							{ //RR B
-								rotateRightCarry(REGISTER_B);
-								return 8;
-							}
-							case 0x19:
-							{ //RR C
-								rotateRightCarry(REGISTER_C);
-								return 8;
-							}
-							case 0x1A:
-							{ //RR D
-								rotateRightCarry(REGISTER_D);
-								return 8;
-							}
-							case 0x1B:
-							{ //RR E
-								rotateRightCarry(REGISTER_E);
-								return 8;
-							}
-							case 0x1C:
-							{ //RR H
-								rotateRightCarry(REGISTER_H);
-								return 8;
-							}
-							case 0x1D:
-							{ //RR L
-								rotateRightCarry(REGISTER_L);
-								return 8;
-							}
-							case 0x1E:
-							{ //RR (HL)
-								rotateRightCarryHL();
-								return 16;
-							}
-							case 0x27:
-							{ //SLA A
-								shiftLeftZero(REGISTER_A);
-								return 8;
-							}
-							case 0x20:
-							{ //SLA B
-								shiftLeftZero(REGISTER_B);
-								return 8;
-							}
-							case 0x21:
-							{ //SLA C
-								shiftLeftZero(REGISTER_C);
-								return 8;
-							}
-							case 0x22:
-							{ //SLA D
-								shiftLeftZero(REGISTER_D);
-								return 8;
-							}
-							case 0x23:
-							{ //SLA E
-								shiftLeftZero(REGISTER_E);
-								return 8;
-							}
-							case 0x24:
-							{ //SLA H
-								shiftLeftZero(REGISTER_H);
-								return 8;
-							}
-							case 0x25:
-							{ //SLA L
-								shiftLeftZero(REGISTER_L);
-								return 8;
-							}
-							case 0x26:
-							{ //SLA (HL)
-								shiftLeftZeroHL();
-								return 16;
-							}
-							case 0x2F:
-							{ //SRA A
-								shiftRightSigned(REGISTER_A);
-								return 8;
-							}
-							case 0x28:
-							{ //SRA B
-								shiftRightSigned(REGISTER_B);
-								return 8;
-							}
-							case 0x29:
-							{ //SRA C
-								shiftRightSigned(REGISTER_C);
-								return 8;
-							}
-							case 0x2A:
-							{ //SRA D
-								shiftRightSigned(REGISTER_D);
-								return 8;
-							}
-							case 0x2B:
-							{ //SRA E
-								shiftRightSigned(REGISTER_E);
-								return 8;
-							}
-							case 0x2C:
-							{ //SRA H
-								shiftRightSigned(REGISTER_H);
-								return 8;
-							}
-							case 0x2D:
-							{ //SRA L
-								shiftRightSigned(REGISTER_L);
-								return 8;
-							}
-							case 0x2E:
-							{ //SRA (HL)
-								shiftRightSignedHL();
-								return 16;
-							}
-							case 0x3F:
-							{ //SRL A
-								shiftRightZero(REGISTER_A);
-								return 8;
-							}
-							case 0x38:
-							{ //SRL B
-								shiftRightZero(REGISTER_B);
-								return 8;
-							}
-							case 0x39:
-							{ //SRL C
-								shiftRightZero(REGISTER_C);
-								return 8;
-							}
-							case 0x3A:
-							{ //SRL D
-								shiftRightZero(REGISTER_D);
-								return 8;
-							}
-							case 0x3B:
-							{ //SRL E
-								shiftRightZero(REGISTER_E);
-								return 8;
-							}
-							case 0x3C:
-							{ //SRL H
-								shiftRightZero(REGISTER_H);
-								return 8;
-							}
-							case 0x3D:
-							{ //SRL L
-								shiftRightZero(REGISTER_L);
-								return 8;
-							}
-							case 0x3E:
-							{ //SRL (HL)
-								shiftRightZeroHL();
-								return 16;
-							}
-							case 0x47:
-							{ //BIT 0,A
-								testBit(0, REGISTER_A);
-								return 8;
-							}
-							case 0x40:
-							{ //BIT 0,B
-								testBit(0, REGISTER_B);
-								return 8;
-							}
-							case 0x41:
-							{ //BIT 0,C
-								testBit(0, REGISTER_C);
-								return 8;
-							}
-							case 0x42:
-							{ //BIT 0,D
-								testBit(0, REGISTER_D);
-								return 8;
-							}
-							case 0x43:
-							{ //BIT 0,E
-								testBit(0, REGISTER_E);
-								return 8;
-							}
-							case 0x44:
-							{ //BIT 0,H
-								testBit(0, REGISTER_H);
-								return 8;
-							}
-							case 0x45:
-							{ //BIT 0,L
-								testBit(0, REGISTER_L);
-								return 8;
-							}
-							case 0x46:
-							{ //BIT 0,(HL)
-								testBitHL(0);
-								return 16;
-							}
-							case 0x4F:
-							{ //BIT 1,A
-								testBit(1, REGISTER_A);
-								return 8;
-							}
-							case 0x48:
-							{ //BIT 1,B
-								testBit(1, REGISTER_B);
-								return 8;
-							}
-							case 0x49:
-							{ //BIT 1,C
-								testBit(1, REGISTER_C);
-								return 8;
-							}
-							case 0x4A:
-							{ //BIT 1,D
-								testBit(1, REGISTER_D);
-								return 8;
-							}
-							case 0x4B:
-							{ //BIT 1,E
-								testBit(1, REGISTER_E);
-								return 8;
-							}
-							case 0x4C:
-							{ //BIT 1,H
-								testBit(1, REGISTER_H);
-								return 8;
-							}
-							case 0x4D:
-							{ //BIT 1,L
-								testBit(1, REGISTER_L);
-								return 8;
-							}
-							case 0x4E:
-							{ //BIT 1,(HL)
-								testBitHL(1);
-								return 16;
-							}
-							case 0x57:
-							{ //BIT 2,A
-								testBit(2, REGISTER_A);
-								return 8;
-							}
-							case 0x50:
-							{ //BIT 2,B
-								testBit(2, REGISTER_B);
-								return 8;
-							}
-							case 0x51:
-							{ //BIT 2,C
-								testBit(2, REGISTER_C);
-								return 8;
-							}
-							case 0x52:
-							{ //BIT 2,D
-								testBit(2, REGISTER_D);
-								return 8;
-							}
-							case 0x53:
-							{ //BIT 2,E
-								testBit(2, REGISTER_E);
-								return 8;
-							}
-							case 0x54:
-							{ //BIT 2,H
-								testBit(2, REGISTER_H);
-								return 8;
-							}
-							case 0x55:
-							{ //BIT 2,L
-								testBit(2, REGISTER_L);
-								return 8;
-							}
-							case 0x56:
-							{ //BIT 2,(HL)
-								testBitHL(2);
-								return 16;
-							}
-							case 0x5F:
-							{ //BIT 3,A
-								testBit(3, REGISTER_A);
-								return 8;
-							}
-							case 0x58:
-							{ //BIT 3,B
-								testBit(3, REGISTER_B);
-								return 8;
-							}
-							case 0x59:
-							{ //BIT 3,C
-								testBit(3, REGISTER_C);
-								return 8;
-							}
-							case 0x5A:
-							{ //BIT 3,D
-								testBit(3, REGISTER_D);
-								return 8;
-							}
-							case 0x5B:
-							{ //BIT 3,E
-								testBit(3, REGISTER_E);
-								return 8;
-							}
-							case 0x5C:
-							{ //BIT 3,H
-								testBit(3, REGISTER_H);
-								return 8;
-							}
-							case 0x5D:
-							{ //BIT 3,L
-								testBit(3, REGISTER_L);
-								return 8;
-							}
-							case 0x5E:
-							{ //BIT 3,(HL)
-								testBitHL(3);
-								return 16;
-							}
-							case 0x67:
-							{ //BIT 4,A
-								testBit(4, REGISTER_A);
-								return 8;
-							}
-							case 0x60:
-							{ //BIT 4,B
-								testBit(4, REGISTER_B);
-								return 8;
-							}
-							case 0x61:
-							{ //BIT 4,C
-								testBit(4, REGISTER_C);
-								return 8;
-							}
-							case 0x62:
-							{ //BIT 4,D
-								testBit(4, REGISTER_D);
-								return 8;
-							}
-							case 0x63:
-							{ //BIT 4,E
-								testBit(4, REGISTER_E);
-								return 8;
-							}
-							case 0x64:
-							{ //BIT 4,H
-								testBit(4, REGISTER_H);
-								return 8;
-							}
-							case 0x65:
-							{ //BIT 4,L
-								testBit(4, REGISTER_L);
-								return 8;
-							}
-							case 0x66:
-							{ //BIT 4,(HL)
-								testBitHL(4);
-								return 16;
-							}
-							case 0x6F:
-							{ //BIT 5,A
-								testBit(5, REGISTER_A);
-								return 8;
-							}
-							case 0x68:
-							{ //BIT 5,B
-								testBit(5, REGISTER_B);
-								return 8;
-							}
-							case 0x69:
-							{ //BIT 5,C
-								testBit(5, REGISTER_C);
-								return 8;
-							}
-							case 0x6A:
-							{ //BIT 5,D
-								testBit(5, REGISTER_D);
-								return 8;
-							}
-							case 0x6B:
-							{ //BIT 5,E
-								testBit(5, REGISTER_E);
-								return 8;
-							}
-							case 0x6C:
-							{ //BIT 5,H
-								testBit(5, REGISTER_H);
-								return 8;
-							}
-							case 0x6D:
-							{ //BIT 5,L
-								testBit(5, REGISTER_L);
-								return 8;
-							}
-							case 0x6E:
-							{ //BIT 5,(HL)
-								testBitHL(5);
-								return 16;
-							}
-							case 0x77:
-							{ //BIT 6,A
-								testBit(6, REGISTER_A);
-								return 8;
-							}
-							case 0x70:
-							{ //BIT 6,B
-								testBit(6, REGISTER_B);
-								return 8;
-							}
-							case 0x71:
-							{ //BIT 6,C
-								testBit(6, REGISTER_C);
-								return 8;
-							}
-							case 0x72:
-							{ //BIT 6,D
-								testBit(6, REGISTER_D);
-								return 8;
-							}
-							case 0x73:
-							{ //BIT 6,E
-								testBit(6, REGISTER_E);
-								return 8;
-							}
-							case 0x74:
-							{ //BIT 6,H
-								testBit(6, REGISTER_H);
-								return 8;
-							}
-							case 0x75:
-							{ //BIT 6,L
-								testBit(6, REGISTER_L);
-								return 8;
-							}
-							case 0x76:
-							{ //BIT 6,(HL)
-								testBitHL(6);
-								return 16;
-							}
-							case 0x7F:
-							{ //BIT 7,A
-								testBit(7, REGISTER_A);
-								return 8;
-							}
-							case 0x78:
-							{ //BIT 7,B
-								testBit(7, REGISTER_B);
-								return 8;
-							}
-							case 0x79:
-							{ //BIT 7,C
-								testBit(7, REGISTER_C);
-								return 8;
-							}
-							case 0x7A:
-							{ //BIT 7,D
-								testBit(7, REGISTER_D);
-								return 8;
-							}
-							case 0x7B:
-							{ //BIT 7,E
-								testBit(7, REGISTER_E);
-								return 8;
-							}
-							case 0x7C:
-							{ //BIT 7,H
-								testBit(7, REGISTER_H);
-								return 8;
-							}
-							case 0x7D:
-							{ //BIT 7,L
-								testBit(7, REGISTER_L);
-								return 8;
-							}
-							case 0x7E:
-							{ //BIT 7,(HL)
-								testBitHL(7);
-								return 16;
-							}
-							case 0xC7:
-							{ //SET 0,A
-								setBit(0, REGISTER_A);
-								return 8;
-							}
-							case 0xC0:
-							{ //SET 0,B
-								setBit(0, REGISTER_B);
-								return 8;
-							}
-							case 0xC1:
-							{ //SET 0,C
-								setBit(0, REGISTER_C);
-								return 8;
-							}
-							case 0xC2:
-							{ //SET 0,D
-								setBit(0, REGISTER_D);
-								return 8;
-							}
-							case 0xC3:
-							{ //SET 0,E
-								setBit(0, REGISTER_E);
-								return 8;
-							}
-							case 0xC4:
-							{ //SET 0,H
-								setBit(0, REGISTER_H);
-								return 8;
-							}
-							case 0xC5:
-							{ //SET 0,L
-								setBit(0, REGISTER_L);
-								return 8;
-							}
-							case 0xC6:
-							{ //SET 0,(HL)
-								setBitHL(0);
-								return 16;
-							}
-							case 0xCF:
-							{ //SET 1,A
-								setBit(1, REGISTER_A);
-								return 8;
-							}
-							case 0xC8:
-							{ //SET 1,B
-								setBit(1, REGISTER_B);
-								return 8;
-							}
-							case 0xC9:
-							{ //SET 1,C
-								setBit(1, REGISTER_C);
-								return 8;
-							}
-							case 0xCA:
-							{ //SET 1,D
-								setBit(1, REGISTER_D);
-								return 8;
-							}
-							case 0xCB:
-							{ //SET 1,E
-								setBit(1, REGISTER_E);
-								return 8;
-							}
-							case 0xCC:
-							{ //SET 1,H
-								setBit(1, REGISTER_H);
-								return 8;
-							}
-							case 0xCD:
-							{ //SET 1,L
-								setBit(1, REGISTER_L);
-								return 8;
-							}
-							case 0xCE:
-							{ //SET 1,(HL)
-								setBitHL(1);
-								return 16;
-							}
-							case 0xD7:
-							{ //SET 2,A
-								setBit(2, REGISTER_A);
-								return 8;
-							}
-							case 0xD0:
-							{ //SET 2,B
-								setBit(2, REGISTER_B);
-								return 8;
-							}
-							case 0xD1:
-							{ //SET 2,C
-								setBit(2, REGISTER_C);
-								return 8;
-							}
-							case 0xD2:
-							{ //SET 2,D
-								setBit(2, REGISTER_D);
-								return 8;
-							}
-							case 0xD3:
-							{ //SET 2,E
-								setBit(2, REGISTER_E);
-								return 8;
-							}
-							case 0xD4:
-							{ //SET 2,H
-								setBit(2, REGISTER_H);
-								return 8;
-							}
-							case 0xD5:
-							{ //SET 2,L
-								setBit(2, REGISTER_L);
-								return 8;
-							}
-							case 0xD6:
-							{ //SET 2,(HL)
-								setBitHL(2);
-								return 16;
-							}
-							case 0xDF:
-							{ //SET 3,A
-								setBit(3, REGISTER_A);
-								return 8;
-							}
-							case 0xD8:
-							{ //SET 3,B
-								setBit(3, REGISTER_B);
-								return 8;
-							}
-							case 0xD9:
-							{ //SET 3,C
-								setBit(3, REGISTER_C);
-								return 8;
-							}
-							case 0xDA:
-							{ //SET 3,D
-								setBit(3, REGISTER_D);
-								return 8;
-							}
-							case 0xDB:
-							{ //SET 3,E
-								setBit(3, REGISTER_E);
-								return 8;
-							}
-							case 0xDC:
-							{ //SET 3,H
-								setBit(3, REGISTER_H);
-								return 8;
-							}
-							case 0xDD:
-							{ //SET 3,L
-								setBit(3, REGISTER_L);
-								return 8;
-							}
-							case 0xDE:
-							{ //SET 3,(HL)
-								setBitHL(3);
-								return 16;
-							}
-							case 0xE7:
-							{ //SET 4,A
-								setBit(4, REGISTER_A);
-								return 8;
-							}
-							case 0xE0:
-							{ //SET 4,B
-								setBit(4, REGISTER_B);
-								return 8;
-							}
-							case 0xE1:
-							{ //SET 4,C
-								setBit(4, REGISTER_C);
-								return 8;
-							}
-							case 0xE2:
-							{ //SET 4,D
-								setBit(4, REGISTER_D);
-								return 8;
-							}
-							case 0xE3:
-							{ //SET 4,E
-								setBit(4, REGISTER_E);
-								return 8;
-							}
-							case 0xE4:
-							{ //SET 4,H
-								setBit(4, REGISTER_H);
-								return 8;
-							}
-							case 0xE5:
-							{ //SET 4,L
-								setBit(4, REGISTER_L);
-								return 8;
-							}
-							case 0xE6:
-							{ //SET 4,(HL)
-								setBitHL(4);
-								return 16;
-							}
-							case 0xEF:
-							{ //SET 5,A
-								setBit(5, REGISTER_A);
-								return 8;
-							}
-							case 0xE8:
-							{ //SET 5,B
-								setBit(5, REGISTER_B);
-								return 8;
-							}
-							case 0xE9:
-							{ //SET 5,C
-								setBit(5, REGISTER_C);
-								return 8;
-							}
-							case 0xEA:
-							{ //SET 5,D
-								setBit(5, REGISTER_D);
-								return 8;
-							}
-							case 0xEB:
-							{ //SET 5,E
-								setBit(5, REGISTER_E);
-								return 8;
-							}
-							case 0xEC:
-							{ //SET 5,H
-								setBit(5, REGISTER_H);
-								return 8;
-							}
-							case 0xED:
-							{ //SET 5,L
-								setBit(5, REGISTER_L);
-								return 8;
-							}
-							case 0xEE:
-							{ //SET 5,(HL)
-								setBitHL(5);
-								return 16;
-							}
-							case 0xF7:
-							{ //SET 6,A
-								setBit(6, REGISTER_A);
-								return 8;
-							}
-							case 0xF0:
-							{ //SET 6,B
-								setBit(6, REGISTER_B);
-								return 8;
-							}
-							case 0xF1:
-							{ //SET 6,C
-								setBit(6, REGISTER_C);
-								return 8;
-							}
-							case 0xF2:
-							{ //SET 6,D
-								setBit(6, REGISTER_D);
-								return 8;
-							}
-							case 0xF3:
-							{ //SET 6,E
-								setBit(6, REGISTER_E);
-								return 8;
-							}
-							case 0xF4:
-							{ //SET 6,H
-								setBit(6, REGISTER_H);
-								return 8;
-							}
-							case 0xF5:
-							{ //SET 6,L
-								setBit(6, REGISTER_L);
-								return 8;
-							}
-							case 0xF6:
-							{ //SET 6,(HL)
-								setBitHL(6);
-								return 16;
-							}
-							case 0xFF:
-							{ //SET 7,A
-								setBit(7, REGISTER_A);
-								return 8;
-							}
-							case 0xF8:
-							{ //SET 7,B
-								setBit(7, REGISTER_B);
-								return 8;
-							}
-							case 0xF9:
-							{ //SET 7,C
-								setBit(7, REGISTER_C);
-								return 8;
-							}
-							case 0xFA:
-							{ //SET 7,D
-								setBit(7, REGISTER_D);
-								return 8;
-							}
-							case 0xFB:
-							{ //SET 7,E
-								setBit(7, REGISTER_E);
-								return 8;
-							}
-							case 0xFC:
-							{ //SET 7,H
-								setBit(7, REGISTER_H);
-								return 8;
-							}
-							case 0xFD:
-							{ //SET 7,L
-								setBit(7, REGISTER_L);
-								return 8;
-							}
-							case 0xFE:
-							{ //SET 7,(HL)
-								setBitHL(7);
-								return 16;
-							}
-							case 0x87:
-							{ //RES 0,A
-								resetBit(0, REGISTER_A);
-								return 8;
-							}
-							case 0x80:
-							{ //RES 0,B
-								resetBit(0, REGISTER_B);
-								return 8;
-							}
-							case 0x81:
-							{ //RES 0,C
-								resetBit(0, REGISTER_C);
-								return 8;
-							}
-							case 0x82:
-							{ //RES 0,D
-								resetBit(0, REGISTER_D);
-								return 8;
-							}
-							case 0x83:
-							{ //RES 0,E
-								resetBit(0, REGISTER_E);
-								return 8;
-							}
-							case 0x84:
-							{ //RES 0,H
-								resetBit(0, REGISTER_H);
-								return 8;
-							}
-							case 0x85:
-							{ //RES 0,L
-								resetBit(0, REGISTER_L);
-								return 8;
-							}
-							case 0x86:
-							{ //RES 0,(HL)
-								resetBitHL(0);
-								return 16;
-							}
-							case 0x8F:
-							{ //RES 1,A
-								resetBit(1, REGISTER_A);
-								return 8;
-							}
-							case 0x88:
-							{ //RES 1,B
-								resetBit(1, REGISTER_B);
-								return 8;
-							}
-							case 0x89:
-							{ //RES 1,C
-								resetBit(1, REGISTER_C);
-								return 8;
-							}
-							case 0x8A:
-							{ //RES 1,D
-								resetBit(1, REGISTER_D);
-								return 8;
-							}
-							case 0x8B:
-							{ //RES 1,E
-								resetBit(1, REGISTER_E);
-								return 8;
-							}
-							case 0x8C:
-							{ //RES 1,H
-								resetBit(1, REGISTER_H);
-								return 8;
-							}
-							case 0x8D:
-							{ //RES 1,L
-								resetBit(1, REGISTER_L);
-								return 8;
-							}
-							case 0x8E:
-							{ //RES 1,(HL)
-								resetBitHL(1);
-								return 16;
-							}
-							case 0x97:
-							{ //RES 2,A
-								resetBit(2, REGISTER_A);
-								return 8;
-							}
-							case 0x90:
-							{ //RES 2,B
-								resetBit(2, REGISTER_B);
-								return 8;
-							}
-							case 0x91:
-							{ //RES 2,C
-								resetBit(2, REGISTER_C);
-								return 8;
-							}
-							case 0x92:
-							{ //RES 2,D
-								resetBit(2, REGISTER_D);
-								return 8;
-							}
-							case 0x93:
-							{ //RES 2,E
-								resetBit(2, REGISTER_E);
-								return 8;
-							}
-							case 0x94:
-							{ //RES 2,H
-								resetBit(2, REGISTER_H);
-								return 8;
-							}
-							case 0x95:
-							{ //RES 2,L
-								resetBit(2, REGISTER_L);
-								return 8;
-							}
-							case 0x96:
-							{ //RES 2,(HL)
-								resetBitHL(2);
-								return 16;
-							}
-							case 0x9F:
-							{ //RES 3,A
-								resetBit(3, REGISTER_A);
-								return 8;
-							}
-							case 0x98:
-							{ //RES 3,B
-								resetBit(3, REGISTER_B);
-								return 8;
-							}
-							case 0x99:
-							{ //RES 3,C
-								resetBit(3, REGISTER_C);
-								return 8;
-							}
-							case 0x9A:
-							{ //RES 3,D
-								resetBit(3, REGISTER_D);
-								return 8;
-							}
-							case 0x9B:
-							{ //RES 3,E
-								resetBit(3, REGISTER_E);
-								return 8;
-							}
-							case 0x9C:
-							{ //RES 3,H
-								resetBit(3, REGISTER_H);
-								return 8;
-							}
-							case 0x9D:
-							{ //RES 3,L
-								resetBit(3, REGISTER_L);
-								return 8;
-							}
-							case 0x9E:
-							{ //RES 3,(HL)
-								resetBitHL(3);
-								return 16;
-							}
-							case 0xA7:
-							{ //RES 4,A
-								resetBit(4, REGISTER_A);
-								return 8;
-							}
-							case 0xA0:
-							{ //RES 4,B
-								resetBit(4, REGISTER_B);
-								return 8;
-							}
-							case 0xA1:
-							{ //RES 4,C
-								resetBit(4, REGISTER_C);
-								return 8;
-							}
-							case 0xA2:
-							{ //RES 4,D
-								resetBit(4, REGISTER_D);
-								return 8;
-							}
-							case 0xA3:
-							{ //RES 4,E
-								resetBit(4, REGISTER_E);
-								return 8;
-							}
-							case 0xA4:
-							{ //RES 4,H
-								resetBit(4, REGISTER_H);
-								return 8;
-							}
-							case 0xA5:
-							{ //RES 4,L
-								resetBit(4, REGISTER_L);
-								return 8;
-							}
-							case 0xA6:
-							{ //RES 4,(HL)
-								resetBitHL(4);
-								return 16;
-							}
-							case 0xAF:
-							{ //RES 5,A
-								resetBit(5, REGISTER_A);
-								return 8;
-							}
-							case 0xA8:
-							{ //RES 5,B
-								resetBit(5, REGISTER_B);
-								return 8;
-							}
-							case 0xA9:
-							{ //RES 5,C
-								resetBit(5, REGISTER_C);
-								return 8;
-							}
-							case 0xAA:
-							{ //RES 5,D
-								resetBit(5, REGISTER_D);
-								return 8;
-							}
-							case 0xAB:
-							{ //RES 5,E
-								resetBit(5, REGISTER_E);
-								return 8;
-							}
-							case 0xAC:
-							{ //RES 5,H
-								resetBit(5, REGISTER_H);
-								return 8;
-							}
-							case 0xAD:
-							{ //RES 5,L
-								resetBit(5, REGISTER_L);
-								return 8;
-							}
-							case 0xAE:
-							{ //RES 5,(HL)
-								resetBitHL(5);
-								return 16;
-							}
-							case 0xB7:
-							{ //RES 6,A
-								resetBit(6, REGISTER_A);
-								return 8;
-							}
-							case 0xB0:
-							{ //RES 6,B
-								resetBit(6, REGISTER_B);
-								return 8;
-							}
-							case 0xB1:
-							{ //RES 6,C
-								resetBit(6, REGISTER_C);
-								return 8;
-							}
-							case 0xB2:
-							{ //RES 6,D
-								resetBit(6, REGISTER_D);
-								return 8;
-							}
-							case 0xB3:
-							{ //RES 6,E
-								resetBit(6, REGISTER_E);
-								return 8;
-							}
-							case 0xB4:
-							{ //RES 6,H
-								resetBit(6, REGISTER_H);
-								return 8;
-							}
-							case 0xB5:
-							{ //RES 6,L
-								resetBit(6, REGISTER_L);
-								return 8;
-							}
-							case 0xB6:
-							{ //RES 6,(HL)
-								resetBitHL(6);
-								return 16;
-							}
-							case 0xBF:
-							{ //RES 7,A
-								resetBit(7, REGISTER_A);
-								return 8;
-							}
-							case 0xB8:
-							{ //RES 7,B
-								resetBit(7, REGISTER_B);
-								return 8;
-							}
-							case 0xB9:
-							{ //RES 7,C
-								resetBit(7, REGISTER_C);
-								return 8;
-							}
-							case 0xBA:
-							{ //RES 7,D
-								resetBit(7, REGISTER_D);
-								return 8;
-							}
-							case 0xBB:
-							{ //RES 7,E
-								resetBit(7, REGISTER_E);
-								return 8;
-							}
-							case 0xBC:
-							{ //RES 7,H
-								resetBit(7, REGISTER_H);
-								return 8;
-							}
-							case 0xBD:
-							{ //RES 7,L
-								resetBit(7, REGISTER_L);
-								return 8;
-							}
-							case 0xBE:
-							{ //RES 7,(HL)
-								resetBitHL(7);
-								return 16;
-							}
-						}
-					}
-					case 0x27:
-				{ //DAA 
-					if (getFlag(FLAG_HALFCARRY) == 1) add(REGISTER_A, 0x06);
-					if (getFlag(FLAG_CARRY) == 1) add(REGISTER_A, 0x60);
-					resetFlag(FLAG_HALFCARRY);
+		switch (b1) {
+    case 0x00 :               // NOP
+    pc++;
+    break;
+    case 0x01 :               // LD BC, nn
+    pc+=3;
+    b = b3;
+    c = b2;
+    break;
+    case 0x02 :               // LD (BC), A
+    pc++;
+    addressWrite((b << 8) | c, a);
+    break;
+    case 0x03 :               // INC BC
+    pc++;
+    c++;
+    if (c == 0x0100) {
+    	b++;
+    	c = 0;
+    	if (b == 0x0100) {
+    		b = 0;
+    	}
+    }
+    break;
+    case 0x04 :               // INC B
+    pc++;
+    f &= F_CARRY;
+    switch (b) {
+    	case 0xFF: f |= F_HALFCARRY + F_ZERO;
+    	b = 0x00;
+    	break;
+    	case 0x0F: f |= F_HALFCARRY;
+    	b = 0x10;
+    	break;
+    	default:   b++;
+    	break;
+    }
+    break;
+    case 0x05 :               // DEC B
+    pc++;
+    f &= F_CARRY;
+    f |= F_SUBTRACT;
+    switch (b) {
+    	case 0x00: f |= F_HALFCARRY;
+    	b = 0xFF;
+    	break;
+    	case 0x10: f |= F_HALFCARRY;
+    	b = 0x0F;
+    	break;
+    	case 0x01: f |= F_ZERO;
+    	b = 0x00;
+    	break;
+    	default:   b--;
+    	break;
+    }
+    break;
+    case 0x06 :               // LD B, nn
+    pc += 2;
+    b = b2;
+    break;
+    case 0x07 :               // RLC A
+    pc++;
+    f = 0;
 
-					/*int highNibble = registers[REGISTER_A] >> 4;
-					int lowNibble = registers[REGISTER_A] & 0x0F;
-					boolean _FC = true;
-					if (getFlag(FLAG_SUBTRACT)==1) {
-						if (getFlag(FLAG_CARRY)==1) {
-							if (getFlag(FLAG_HALFCARRY)==1) {
-								registers[REGISTER_A] += 0x9A;
-							} else {
-								registers[REGISTER_A] += 0xA0;
-							}
-						} else {
-							_FC = false;
-							if (getFlag(FLAG_HALFCARRY)==1) {
-								registers[REGISTER_A] += 0xFA;
-							} else {
-								registers[REGISTER_A] += 0x00;
-							}
-						}
-					} else if (getFlag(FLAG_CARRY)==1) {
-						if ((getFlag(FLAG_HALFCARRY)==1) || lowNibble > 9) {
-							registers[REGISTER_A] += 0x66;
-						} else {
-							registers[REGISTER_A] += 0x60;
-						}
-					} else if (getFlag(FLAG_HALFCARRY)==1) {
-						if (highNibble > 9) {
-							registers[REGISTER_A] += 0x66;
-						} else {
-							registers[REGISTER_A] += 0x06;
-							_FC = false;
-						}
-					} else if (lowNibble > 9) {
-						if (highNibble < 9) {
-							_FC = false;
-							registers[REGISTER_A] += 0x06;
-						} else {
-							registers[REGISTER_A] += 0x66;
-						}
-					} else if (highNibble > 9) {
-						registers[REGISTER_A] += 0x60;
-					} else {
-						_FC = false;
-					}
+    a <<= 1;
 
-					registers[REGISTER_A] &= 0xFF;
-					if (_FC)
-						setFlag(FLAG_CARRY);
-					else
-						resetFlag(FLAG_CARRY);
-					if(registers[REGISTER_A] == 0)
-						setFlag(FLAG_ZERO);
-					else
-					resetFlag(FLAG_ZERO);*/
+    if ((a & 0x0100) != 0) {
+    	f |= F_CARRY;
+    	a |= 1;
+    	a &= 0xFF;
+    }
+    if (a == 0) {
+    	f |= F_ZERO;
+    }
+    break;
+    case 0x08 :               // LD (nnnn), SP   /* **** May be wrong! **** */
+    pc+=3;
+    addressWrite((b3 << 8) + b2 + 1, (sp & 0xFF00) >> 8);
+    addressWrite((b3 << 8) + b2, (sp & 0x00FF));
+    break;
+    case 0x09 :               // ADD HL, BC
+    pc++;
+    hl = (hl + ((b << 8) + c));
+    if ((hl & 0xFFFF0000) != 0) {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)) | (F_CARRY));
+    	hl &= 0xFFFF;
+    } else {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)));
+    }
+    break;
+    case 0x0A :               // LD A, (BC)
+    pc++;
+    a = JavaBoy.unsign(addressRead((b << 8) + c));
+    break;
+    case 0x0B :               // DEC BC
+    pc++;
+    c--;
+    if ((c & 0xFF00) != 0) {
+    	c = 0xFF;
+    	b--;
+    	if ((b & 0xFF00) != 0) {
+    		b = 0xFF;
+    	}
+    }
+    break;
+    case 0x0C :               // INC C
+    pc++;
+    f &= F_CARRY;
+    switch (c) {
+    	case 0xFF: f |= F_HALFCARRY + F_ZERO;
+    	c = 0x00;
+    	break;
+    	case 0x0F: f |= F_HALFCARRY;
+    	c = 0x10;
+    	break;
+    	default:   c++;
+    	break;
+    }
+    break;
+    case 0x0D :               // DEC C
+    pc++;
+    f &= F_CARRY;
+    f |= F_SUBTRACT;
+    switch (c) {
+    	case 0x00: f |= F_HALFCARRY;
+    	c = 0xFF;
+    	break;
+    	case 0x10: f |= F_HALFCARRY;
+    	c = 0x0F;
+    	break;
+    	case 0x01: f |= F_ZERO;
+    	c = 0x00;
+    	break;
+    	default:   c--;
+    	break;
+    }
+    break;
+    case 0x0E :               // LD C, nn
+    pc+=2;
+    c = b2;
+    break;        
+    case 0x0F :               // RRC A
+    pc++;
+    if ((a & 0x01) == 0x01) {
+    	f = F_CARRY;
+    } else {
+    	f = 0;
+    }
+    a >>= 1;
+    if ((f & F_CARRY) == F_CARRY) {
+    	a |= 0x80;
+    }
+    if (a == 0) {
+    	f |= F_ZERO;
+    }
+    break;
+    case 0x10 :               // STOP
+    pc+=2;
 
+    if (gbcFeatures) {
+    	if ((ioHandler.registers[0x4D] & 0x01) == 1) {
+    		int newKey1Reg = ioHandler.registers[0x4D] & 0xFE;
+    		if ((newKey1Reg & 0x80) == 0x80) {
+    			setDoubleSpeedCpu(false);
+    			newKey1Reg &= 0x7F;
+    		} else {
+    			setDoubleSpeedCpu(true);
+    			newKey1Reg |= 0x80;
+//           System.out.println("CAUTION: Game uses double speed CPU, humoungus PC required!");
+    		}
+    		ioHandler.registers[0x4D] = (byte) newKey1Reg;
+    	}
+    }
 
-					return 4;
-				}
-				case 0x2F:
-				{ //CPL
-					registers[REGISTER_A] = (~registers[REGISTER_A]) & 0xFF;
-					setFlag(FLAG_SUBTRACT);
-					setFlag(FLAG_HALFCARRY);
-					return 4;
-				}
-				case 0x3F:
-				{ //CCF
-					resetFlag(FLAG_SUBTRACT);
-					resetFlag(FLAG_HALFCARRY);
-					invertFlag(FLAG_CARRY);
-					return 4;
-				}
-				case 0x37:
-				{ //SCF
-					resetFlag(FLAG_SUBTRACT);
-					resetFlag(FLAG_HALFCARRY);
-					setFlag(FLAG_CARRY);
-					return 4;
-				}
-				case 0x76:
-				{ //HALT
-					// 				Description:
-					// Power down CPU until an interrupt occurs. Use this when ever possible to reduce energy consumption.
-					// Opcode  Cycles
-					// ￼￼￼Opcodes:
-					// Instruction Parameters Opcode Cycles
-					// HALT -/- 76 4
-					halt();
-					return 4;
-				}
-				case 0x10:
-				{ //STOP
-					// 				Description:
-					// Halt CPU & LCD display until button pressed.
-					// ￼
-					// ￼￼￼Opcodes:
-					// Instruction Parameters
-					// STOP -/-
-					// by DP
-					// Opcode  Cycles
-					// 10 00 4
-					return 4;
-				}
-				case 0xF3:
-				{ //DI
-					// 				Description:
-					// This instruction disables interrupts but not immediately. Interrupts are disabled after instruction after DI is executed.
-					// Flags affected: None.
-					// Opcodes:
-					// Instruction Parameters Opcode Cycles
-					// DI -/- F3 4
-					interuptMasterEnable = false;
-					return 4;
-				}
-				case 0xFB:
-				{ //EI
-					// 	Description:
-					// Enable interrupts. This intruction enables interrupts but not immediately. Interrupts are enabled after instruction after EI is executed.
-					// ￼￼￼￼￼￼
-					// ￼￼￼Flags affected: None.
-					// Opcodes:
-					// Instruction Parameters Opcode Cycles
-					// EI -/- FB 4
-					interuptMasterEnable = true;
-					return 4;
-				}
-				case 0x07:
-				{ //RLCA
-					rotateLeft(REGISTER_A);
-					return 4;
-				}
-				case 0x17:
-				{ //RLA
-					rotateLeftCarry(REGISTER_A);
-					return 4;
-				}
-				case 0x0F:
-				{ //RRCA
-					rotateRight(REGISTER_A);
-					return 4;
-				}
-				case 0x1F:
-				{ //RRA
-					rotateRightCarry(REGISTER_A);
-					return 4;
-				}
-				case 0xC7:
-				{ //RST $00
-					restartOP();
-					return 32;
-				}
-				case 0xCF:
-				{ //RST $08
-					restartOP();
-					return 32;
-				}
-				case 0xD7:
-				{ //RST $10
-					restartOP();
-					return 32;
-				}
-				case 0xDF:
-				{ //RST $18
-					restartOP();
-					return 32;
-				}
-				case 0xE7:
-				{ //RST $20
-					restartOP();
-					return 32;
-				}
-				case 0xEF:
-				{ //RST $28
-					restartOP();
-					return 32;
-				}
-				case 0xF7:
-				{ //RST $30
-					restartOP();
-					return 32;
-				}
-				case 0xFF:
-				{ //RST $38
-					restartOP();
-					return 32;
-				}
-				case 0xC3:
-				{ //JP nn
-					jump();
-					return 12;
-				}
-				case 0xC2:
-				{ //JP NZ,nn
-					jumpCC("NZ");
-					return 12;
-				}
-				case 0xCA:
-				{ //JP Z,nn
-					jumpCC("Z");
-					return 12;
-				}
-				case 0xD2:
-				{ //JP NC,nn
-					jumpCC("NC");
-					return 12;
-				}
-				case 0xDA:
-				{ //JP C,nn
-					jumpCC("C");
-					return 12;
-				}
-				case 0xE9:
-				{ //JP (HL)
-					jumpHL();
-					return 4;
-				}
-				case 0x18:
-				{ //JR n
-					jumpRel();
-					return 8;
-				}
-				case 0x20:
-				{ //JR NZ,n
-					jumpRelCC("NZ");
-					return 8;
-				}
-				case 0x28:
-				{ //JR Z,n
-					jumpRelCC("Z");
-					return 8;
-				}
-				case 0x30:
-				{ //JR NC,n
-					jumpRelCC("NC");
-					return 8;
-				}
-				case 0x38:
-				{ //JR C,n
-					jumpRelCC("C");
-					return 8;
-				}
-				case 0xCD:
-				{ //CALL
-					call();
-					return 12;
-				}
-				case 0xC4:
-				{ //CALL NZ,nn
-					callCC("NZ");
-					return 12;
-				}
-				case 0xCC:
-				{ //CALL Z,nn
-					callCC("Z");
-					return 12;
-				}
-				case 0xD4:
-				{ //CALL NC,nn
-					callCC("NC");
-					return 12;
-				}
-				case 0xDC:
-				{ //CALL C,nn
-					callCC("C");
-					return 12;
-				}
-				case 0xC9:
-				{ //RET
-					returnOP();
-					return 8;
-				}
-				case 0xC0:
-				{ //RET NZ
-					returnOPCC("NZ");
-					return 8;
-				}
-				case 0xC8:
-				{ //RET Z
-					returnOPCC("Z");
-					return 8;
-				}
-				case 0xD0:
-				{ //RET NC
-					returnOPCC("NC");
-					return 8;
-				}
-				case 0xD8:
-				{ //RET C
-					returnOPCC("C");
-					return 8;
-				}
-				case 0xD9:
-				{ //RETI
-					reti();
-					return 8;
-				}
-			}
-			return 0;
-		} //end switch
+//        terminate = true;
+//        System.out.println("- Breakpoint reached");
+    break;
+    case 0x11 :               // LD DE, nnnn
+    pc+=3;
+    d = b3;
+    e = b2;
+    break;
+    case 0x12 :               // LD (DE), A
+    pc++;
+    addressWrite((d << 8) + e, a);
+    break;
+    case 0x13 :               // INC DE
+    pc++;
+    e++;
+    if (e == 0x0100) {
+    	d++;
+    	e = 0;
+    	if (d == 0x0100) {
+    		d = 0;
+    	}
+    }
+    break;
+    case 0x14 :               // INC D
+    pc++;
+    f &= F_CARRY;
+    switch (d) {
+    	case 0xFF: f |= F_HALFCARRY + F_ZERO;
+    	d = 0x00;
+    	break;
+    	case 0x0F: f |= F_HALFCARRY;
+    	d = 0x10;
+    	break;
+    	default:   d++;
+    	break;
+    }
+    break;
+    case 0x15 :               // DEC D
+    pc++;
+    f &= F_CARRY;
+    f |= F_SUBTRACT;
+    switch (d) {
+    	case 0x00: f |= F_HALFCARRY;
+    	d = 0xFF;
+    	break;
+    	case 0x10: f |= F_HALFCARRY;
+    	d = 0x0F;
+    	break;
+    	case 0x01: f |= F_ZERO;
+    	d = 0x00;
+    	break;
+    	default:   d--;
+    	break;
+    }
+    break;
+    case 0x16 :               // LD D, nn
+    pc += 2;
+    d = b2;
+    break;
+    case 0x17 :               // RL A
+    pc++;
+    if ((a & 0x80) == 0x80) {
+    	newf = F_CARRY;
+    } else {
+    	newf = 0;
+    }
+    a <<= 1;
+    
+    if ((f & F_CARRY) == F_CARRY) {
+    	a |= 1;
+    }
 
-		private int readHL() {
-			return memory.readByte(combine(REGISTER_H, REGISTER_L));
-		}
+    a &= 0xFF;
+    if (a == 0) {
+    	newf |= F_ZERO;
+    }
+    f = newf;
+    break;
+    case 0x18 :               // JR nn
+    pc += 2 + offset;
+    break;
+    case 0x19 :               // ADD HL, DE
+    pc++;
+    hl = (hl + ((d << 8) + e));
+    if ((hl & 0xFFFF0000) != 0) {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)) | (F_CARRY));
+    	hl &= 0xFFFF;
+    } else {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)));
+    }
+    break;
+    case 0x1A :               // LD A, (DE)
+    pc++;
+    a = JavaBoy.unsign(addressRead((d << 8) + e));
+    break;
+    case 0x1B :               // DEC DE
+    pc++;
+    e--;
+    if ((e & 0xFF00) != 0) {
+    	e = 0xFF;
+    	d--;
+    	if ((d & 0xFF00) != 0) {
+    		d = 0xFF;
+    	}
+    }
+    break;
+    case 0x1C :               // INC E
+    pc++;
+    f &= F_CARRY;
+    switch (e) {
+    	case 0xFF: f |= F_HALFCARRY + F_ZERO;
+    	e = 0x00;
+    	break;
+    	case 0x0F: f |= F_HALFCARRY;
+    	e = 0x10;
+    	break;
+    	default:   e++;
+    	break;
+    }
+    break;
+    case 0x1D :               // DEC E
+    pc++;
+    f &= F_CARRY;
+    f |= F_SUBTRACT;
+    switch (e) {
+    	case 0x00: f |= F_HALFCARRY;
+    	e = 0xFF;
+    	break;
+    	case 0x10: f |= F_HALFCARRY;
+    	e = 0x0F;
+    	break;
+    	case 0x01: f |= F_ZERO;
+    	e = 0x00;
+    	break;
+    	default:   e--;
+    	break;
+    }
+    break;
+    case 0x1E :               // LD E, nn
+    pc+=2;
+    e = b2;
+    break;
+    case 0x1F :               // RR A
+    pc++;
+    if ((a & 0x01) == 0x01) {
+    	newf = F_CARRY;
+    } else {
+    	newf = 0;
+    }
+    a >>= 1;
+    
+    if ((f & F_CARRY) == F_CARRY) {
+    	a |= 0x80;
+    }
+    
+    if (a == 0) {
+    	newf |= F_ZERO;
+    }
+    f = newf;
+    break;
+    case 0x20 :               // JR NZ, nn
+    if ((f & 0x80) == 0x00) {
+    	pc += 2 + offset;
+    } else {
+    	pc += 2;
+    }
+    break;
+    case 0x21 :               // LD HL, nnnn
+    pc += 3;
+    hl = (b3 << 8) + b2;
+    break;
+    case 0x22 :               // LD (HL+), A
+    pc++;
+    addressWrite(hl, a);
+    hl = (hl + 1) & 0xFFFF;
+    break;
+    case 0x23 :               // INC HL
+    pc++;
+    hl = (hl + 1) & 0xFFFF;
+    break;
+    case 0x24 :               // INC H         ** May be wrong **
+    pc++;
+    f &= F_CARRY;
+    switch ((hl & 0xFF00) >> 8) {
+    	case 0xFF: f |= F_HALFCARRY + F_ZERO;
+    	hl = (hl & 0x00FF);
+    	break;
+    	case 0x0F: f |= F_HALFCARRY;
+    	hl = (hl & 0x00FF) | 0x10;
+    	break;
+    	default:   hl = (hl + 0x0100);
+    	break;
+    }
+    break;
+    case 0x25 :               // DEC H           ** May be wrong **
+    pc++;
+    f &= F_CARRY;
+    f |= F_SUBTRACT;
+    switch ((hl & 0xFF00) >> 8) {
+    	case 0x00: f |= F_HALFCARRY;
+    	hl = (hl & 0x00FF) | (0xFF00);
+    	break;
+    	case 0x10: f |= F_HALFCARRY;
+    	hl = (hl & 0x00FF) | (0x0F00);
+    	break;
+    	case 0x01: f |= F_ZERO;
+    	hl = (hl & 0x00FF);
+    	break;
+    	default:   hl = (hl & 0x00FF) | ((hl & 0xFF00) - 0x0100);
+    	break;
+    }
+    break;
+    case 0x26 :               // LD H, nn
+    pc+=2;
+    hl = (hl & 0x00FF) | (b2 << 8);
+    break;
+    case 0x27 :               // DAA         ** This could be wrong! **
+    pc++;
 
-		private void writeHL(int data) {
-			memory.writeByte(combine(REGISTER_H, REGISTER_L), data & 0xFFFF);
-		}
+    int upperNibble = (a & 0xF0) >> 4;
+    int lowerNibble = a & 0x0F;
 
-		private void compare(int r1, int data) {
-			clearFlags();
-			setFlag(FLAG_SUBTRACT);
+//        System.out.println("Daa at " + JavaBoy.hexWord(pc));
 
-			if (data > registers[r1])
-				setFlag(FLAG_CARRY);
-			else if (registers[r1] == data)
-				setFlag(FLAG_ZERO);
+    newf = (short) (f & F_SUBTRACT);
 
-			if ((data & 0x0F) > (registers[r1] & 0x0F))
-				setFlag(FLAG_HALFCARRY);
-		}
+    if ((f & F_SUBTRACT) == 0) {
 
-		private void checkZeroFlag(int r1) {
-			if (registers[r1] == 0) setFlag(FLAG_ZERO);
-			else resetFlag(FLAG_ZERO);
-		}
+    	if ((f & F_CARRY) == 0) {
+    		if ((upperNibble <= 8) && (lowerNibble >= 0xA) &&
+    			((f & F_HALFCARRY) == 0)) {
+    			a += 0x06;
+    	}
 
-		private void setFlag(int flag) {
-			registers[REGISTER_F] |= flag;
-		}
+    	if ((upperNibble <= 9) && (lowerNibble <= 0x3) &&
+    		((f & F_HALFCARRY) == F_HALFCARRY)) {
+    		a += 0x06;
+    }
 
-		private void resetFlag(int flag) {
-			registers[REGISTER_F] &= (~(flag)) & 0xFF;
-		}
+    if ((upperNibble >= 0xA) && (lowerNibble <= 0x9) &&
+    	((f & F_HALFCARRY) == 0)) {
+    	a += 0x60;
+    newf |= F_CARRY;
+}
 
-		private void invertFlag(int flag) {
-			if (getFlag(flag) == 1) resetFlag(flag);
-			else setFlag(flag);
-		}
+if ((upperNibble >= 0x9) && (lowerNibble >= 0xA) &&
+	((f & F_HALFCARRY) == 0)) {
+	a += 0x66;
+newf |= F_CARRY;
+}
 
-		public int getFlag(int flag) {
-			int flagVal = 0;
-			int flagReg = (registers[REGISTER_F] & flag);
-			switch (flag) {
-				case FLAG_ZERO:
-				flagVal = flagReg >>> 7;
-				break;
-				case FLAG_SUBTRACT:
-				flagVal = flagReg >>> 6;
-				break;
-				case FLAG_HALFCARRY:
-				flagVal = flagReg >>> 5;
-				break;
-				case FLAG_CARRY:
-				flagVal = flagReg >>> 4;
-				break;
-			}
-			return flagVal;
-		}
+if ((upperNibble >= 0xA) && (lowerNibble <= 0x3) &&
+	((f & F_HALFCARRY) == F_HALFCARRY)) {
+	a += 0x66;
+newf |= F_CARRY;
+}
 
-		private void loadFlag(int flag, int data) {
-			if (data == 1) setFlag(flag);
-			else resetFlag(flag);
-		}
+         } else {  // If carry set
 
-		private void clearFlags() {
-			registers[REGISTER_F] = 0;
-		}
+         	if ((upperNibble <= 0x2) && (lowerNibble <= 0x9) &&
+         		((f & F_HALFCARRY) == 0)) {
+         		a += 0x60;
+         	newf |= F_CARRY;
+         }
 
-		private void clearFlags(int[] flagArr) {
-			for(int num : flagArr)
-				resetFlag(num);
-		}
+         if ((upperNibble <= 0x2) && (lowerNibble >= 0xA) &&
+         	((f & F_HALFCARRY) == 0)) {
+         	a += 0x66;
+         newf |= F_CARRY;
+     }
 
-		private void rotateLeft(int r1) {
-			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT, FLAG_CARRY});
+     if ((upperNibble <= 0x3) && (lowerNibble <= 0x3) &&
+     	((f & F_HALFCARRY) == F_HALFCARRY)) {
+     	a += 0x66;
+     newf |= F_CARRY;
+ }
 
-			int bit7 = registers[r1] >>> 7;
-			registers[r1] <<= 1;
-			registers[r1] |= bit7;
-			registers[r1] &= 0xFF;
+}
 
-			if (memory.readByte(pc - 1) == 0xCB)
-				checkZeroFlag(r1);
-			else
-				resetFlag(FLAG_ZERO);
+        } else { // Subtract is set
 
-			if (bit7 == 1) setFlag(FLAG_CARRY);
-		}
+        	if ((f & F_CARRY) == 0) {
 
-		private void rotateLeftHL() {
-			clearFlags();
-			int tempByte = readHL();
-			int bit7 = tempByte >>> 7;
-			tempByte <<= 1;
-			tempByte |= bit7;
-			tempByte &= 0xFFFF;
+        		if ((upperNibble <= 0x8) && (lowerNibble >= 0x6) &&
+        			((f & F_HALFCARRY) == F_HALFCARRY)) {
+        			a += 0xFA;
+        	}
 
-			writeHL(tempByte);
+         } else { // Carry is set
 
-			if (tempByte == 0) setFlag(FLAG_ZERO);
+         	if ((upperNibble >= 0x7) && (lowerNibble <= 0x9) &&
+         		((f & F_HALFCARRY) == 0)) {
+         		a += 0xA0;
+         	newf |= F_CARRY;
+         }
 
-			if (bit7 == 1) setFlag(FLAG_CARRY);
-		}
+         if ((upperNibble >= 0x6) && (lowerNibble >= 0x6) &&
+         	((f & F_HALFCARRY) == F_HALFCARRY)) {
+         	a += 0x9A;
+         newf |= F_CARRY;
+     }
 
-		private void rotateLeftCarry(int r1) {
-			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT});
+ }
 
-			int bit7 = (registers[r1] >>> 7) & 0x1;
-			registers[r1] <<= 1;
-			registers[r1] |= getFlag(FLAG_CARRY);
-			registers[r1] &= 0xFF;
+}
 
-			if (memory.readByte(pc - 1) == 0xCB)
-				checkZeroFlag(r1);
-			else
-				resetFlag(FLAG_ZERO);
+a &= 0x00FF;
+if (a == 0) newf |= F_ZERO;
 
-			if (bit7 == 1)
-				setFlag(FLAG_CARRY);
-			else
-				resetFlag(FLAG_CARRY);
-		}
+f = newf;
 
-		private void rotateLeftCarryHL() {
-			int flagStat = getFlag(FLAG_CARRY);
-			clearFlags();
-			loadFlag(FLAG_CARRY, flagStat);
+break;
+    case 0x28 :               // JR Z, nn
+    if ((f & F_ZERO) == F_ZERO) {
+    	pc += 2 + offset;
+    } else {
+    	pc += 2;
+    }
+    break;
+    case 0x29 :               // ADD HL, HL
+    pc++;
+    hl = (hl + hl);
+    if ((hl & 0xFFFF0000) != 0) {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)) | (F_CARRY));
+    	hl &= 0xFFFF;
+    } else {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)));
+    }
+    break;
+    case 0x2A :               // LDI A, (HL)
+    pc++;                    
+    a = JavaBoy.unsign(addressRead(hl));
+    hl++;
+    break;
+    case 0x2B :               // DEC HL
+    pc++;
+    if (hl == 0) {
+    	hl = 0xFFFF;
+    } else {
+    	hl--;
+    }
+    break;
+    case 0x2C :               // INC L
+    pc++;
+    f &= F_CARRY;
+    switch (hl & 0x00FF) {
+    	case 0xFF: f |= F_HALFCARRY + F_ZERO;
+    	hl = hl & 0xFF00;
+    	break;
+    	case 0x0F: f |= F_HALFCARRY;
+    	hl++;
+    	break;
+    	default:   hl++;
+    	break;
+    }
+    break;
+    case 0x2D :               // DEC L
+    pc++;
+    f &= F_CARRY;
+    f |= F_SUBTRACT;
+    switch (hl & 0x00FF) {
+    	case 0x00: f |= F_HALFCARRY;
+    	hl = (hl & 0xFF00) | 0x00FF;
+    	break;
+    	case 0x10: f |= F_HALFCARRY;
+    	hl = (hl & 0xFF00) | 0x000F;
+    	break;
+    	case 0x01: f |= F_ZERO;
+    	hl = (hl & 0xFF00);
+    	break;
+    	default:   hl = (hl & 0xFF00) | ((hl & 0x00FF) - 1);
+    	break;
+    }
+    break;
+    case 0x2E :               // LD L, nn
+    pc+=2;
+    hl = (hl & 0xFF00) | b2;
+    break;
+    case 0x2F :               // CPL A
+    pc++;
+    short mask = 0x80;
+/*        short result = 0;
+        for (int n = 0; n < 8; n++) {
+         if ((a & mask) == 0) {
+          result |= mask;
+         } else {
+         }
+         mask >>= 1;
+     }*/
+     a = (short) ((~a) & 0x00FF);
+     f = (short) ((f & (F_CARRY | F_ZERO)) | F_SUBTRACT | F_HALFCARRY);
+     break;
+    case 0x30 :               // JR NC, nn
+    if ((f & F_CARRY) == 0) {
+    	pc += 2 + offset;
+    } else {
+    	pc += 2;
+    }
+    break;
+    case 0x31 :               // LD SP, nnnn
+    pc += 3;
+    sp = (b3 << 8) + b2;
+    break;
+    case 0x32 :
+    pc++;
+        addressWrite(hl, a);  // LD (HL-), A
+        hl--;
+        break;
+    case 0x33 :               // INC SP
+    pc++;
+    sp = (sp + 1) & 0xFFFF;
+    break;
+    case 0x34 :               // INC (HL)
+    pc++;
+    f &= F_CARRY;
+    dat = JavaBoy.unsign(addressRead(hl));
+    switch (dat) {
+    	case 0xFF: f |= F_HALFCARRY + F_ZERO;
+    	addressWrite(hl, 0x00);
+    	break;
+    	case 0x0F: f |= F_HALFCARRY;
+    	addressWrite(hl, 0x10);
+    	break;
+    	default:   addressWrite(hl, dat + 1);
+    	break;
+    }
+    break;
+    case 0x35 :               // DEC (HL)
+    pc++;
+    f &= F_CARRY;
+    f |= F_SUBTRACT;
+    dat = JavaBoy.unsign(addressRead(hl));
+    switch (dat) {
+    	case 0x00: f |= F_HALFCARRY;
+    	addressWrite(hl, 0xFF);
+    	break;
+    	case 0x10: f |= F_HALFCARRY;
+    	addressWrite(hl, 0x0F);
+    	break;
+    	case 0x01: f |= F_ZERO;
+    	addressWrite(hl, 0x00);
+    	break;
+    	default:   addressWrite(hl, dat - 1);
+    	break;
+    }
+    break;
+    case 0x36 :               // LD (HL), nn
+    pc += 2;
+    addressWrite(hl, b2);
+    break;
+    case 0x37 :               // SCF
+    pc++;
+    f &= F_ZERO;
+    f |= F_CARRY;
+    break;
+    case 0x38 :               // JR C, nn
+    if ((f & F_CARRY) == F_CARRY) {
+    	pc += 2 + offset;
+    } else {
+    	pc += 2;
+    }
+    break;
+    case 0x39 :               // ADD HL, SP      ** Could be wrong **
+    pc++;
+    hl = (hl + sp);
+    if ((hl & 0xFFFF0000) != 0) {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)) | (F_CARRY));
+    	hl &= 0xFFFF;
+    } else {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)));
+    }
+    break;
+    case 0x3A :               // LD A, (HL-)
+    pc++;
+    a = JavaBoy.unsign(addressRead(hl));
+    hl = (hl - 1) & 0xFFFF;
+    break;
+    case 0x3B :               // DEC SP
+    pc++;
+    sp = (sp - 1) & 0xFFFF;
+    break;
+    case 0x3C :               // INC A
+    pc++;
+    f &= F_CARRY;
+    switch (a) {
+    	case 0xFF: f |= F_HALFCARRY + F_ZERO;
+    	a = 0x00;
+    	break;
+    	case 0x0F: f |= F_HALFCARRY;
+    	a = 0x10;
+    	break;
+    	default:   a++;
+    	break;
+    }
+    break;
+    case 0x3D :               // DEC A
+    pc++;
+    f &= F_CARRY;
+    f |= F_SUBTRACT;
+    switch (a) {
+    	case 0x00: f |= F_HALFCARRY;
+    	a = 0xFF;
+    	break;
+    	case 0x10: f |= F_HALFCARRY;
+    	a = 0x0F;
+    	break;
+    	case 0x01: f |= F_ZERO;
+    	a = 0x00;
+    	break;
+    	default:   a--;
+    	break;
+    }
+    break;
+    case 0x3E :               // LD A, nn
+    pc += 2;
+    a = b2;
+    break;
+    case 0x3F :               // CCF
+    pc++;
+    if ((f & F_CARRY) == 0) {
+    	f = (short) ((f & F_ZERO) | F_CARRY);
+    } else {
+    	f = (short) (f & F_ZERO);
+    }
+    break;
+    case 0x52 :               // Debug breakpoint (LD D, D)
+	    // As this insturction is used in games (why?) only break here if the breakpoint is on in the debugger
+    if (breakpointEnable) {
+    	terminate = true;
+    	System.out.println("- Breakpoint reached");
+    } else {
+    	pc++;
+    }
+    break;
 
-			int tempByte = readHL();
-			int bit7 = tempByte >>> 7;
-			tempByte <<= 1;
-			tempByte |= getFlag(FLAG_CARRY);
-			tempByte &= 0xFFFF;
+    case 0x76 :               // HALT
+    interruptsEnabled = true;
+//		System.out.println("Halted, pc = " + JavaBoy.hexWord(pc));
+    while (ioHandler.registers[0x0F] == 0) {
+    	initiateInterrupts();
+    	instrCount++;
+    }
 
-			writeHL(tempByte);
+//		System.out.println("intrcount: " + instrCount + " IE: " + JavaBoy.hexByte(ioHandler.registers[0xFF]));
+//		System.out.println(" Finished halt");
+    pc++;
+    break;
+    case 0xAF :               // XOR A, A (== LD A, 0)
+    pc ++;
+    a = 0;
+        f = 0x80;             // Set zero flag
+        break;
+    case 0xC0 :               // RET NZ
+    if ((f & F_ZERO) == 0) {
+    	pc = (JavaBoy.unsign(addressRead(sp + 1)) << 8) + JavaBoy.unsign(addressRead(sp));
+    	sp += 2;
+    } else {
+    	pc++;
+    }
+    break;
+    case 0xC1 :               // POP BC
+    pc++;
+    c = JavaBoy.unsign(addressRead(sp));
+    b = JavaBoy.unsign(addressRead(sp + 1));
+    sp+=2;
+    break;
+    case 0xC2 :               // JP NZ, nnnn
+    if ((f & F_ZERO) == 0) {
+    	pc = (b3 << 8) + b2;
+    } else {
+    	pc += 3;
+    }
+    break;
+    case 0xC3 :
+        pc = (b3 << 8) + b2;  // JP nnnn
+        break;
+    case 0xC4 :               // CALL NZ, nnnnn
+    if ((f & F_ZERO) == 0) {
+    	pc += 3;
+    	sp -= 2;
+    	addressWrite(sp + 1, pc >> 8);
+    	addressWrite(sp, pc & 0x00FF);
+    	pc = (b3 << 8) + b2;
+    } else {
+    	pc+=3;
+    }
+    break;
+    case 0xC5 :               // PUSH BC
+    pc++;
+    sp -= 2;
+    sp &= 0xFFFF;
+    addressWrite(sp, c);
+    addressWrite(sp + 1, b);
+    break;
+    case 0xC6 :               // ADD A, nn
+    pc+=2;
+    f = 0;
 
-			if (tempByte == 0) setFlag(FLAG_ZERO);
+    if ((((a & 0x0F) + (b2 & 0x0F)) & 0xF0) != 0x00) {
+    	f |= F_HALFCARRY;
+    }
 
-			if (bit7 == 1) 
-				setFlag(FLAG_CARRY);
-			else
-				resetFlag(FLAG_CARRY);
-		}
+    a += b2;
 
-		private void rotateRight(int r1) {
-			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT, FLAG_CARRY});
+        if ((a & 0xFF00) != 0) {     // Perform 8-bit overflow and set zero flag
+        	if (a == 0x0100) {
+        		f |= F_ZERO + F_CARRY + F_HALFCARRY;
+        		a = 0;
+        	} else {
+        		f |= F_CARRY + F_HALFCARRY;
+        		a &= 0x00FF;
+        	}
+        }
+        break;
+    case 0xCF :               // RST 08
+    pc++;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+    pc = 0x08;
+    break;
+    case 0xC8 :               // RET Z
+    if ((f & F_ZERO) == F_ZERO) {
+    	pc = (JavaBoy.unsign(addressRead(sp + 1)) << 8) + JavaBoy.unsign(addressRead(sp));
+    	sp += 2;
+    } else {
+    	pc++;
+    }
+    break;
+    case 0xC9 :               // RET
+    pc = (JavaBoy.unsign(addressRead(sp + 1)) << 8) + JavaBoy.unsign(addressRead(sp));
+    sp += 2;
+    break;
+    case 0xCA :               // JP Z, nnnn
+    if ((f & F_ZERO) == F_ZERO) {
+    	pc = (b3 << 8) + b2;
+    } else {
+    	pc += 3;
+    }
+    break;
+    case 0xCB :               // Shift/bit test
+    pc += 2;
+    int regNum = b2 & 0x07;
+    int data = registerRead(regNum);
+//        System.out.println("0xCB instr! - reg " + JavaBoy.hexByte((short) (b2 & 0xF4)));
+    if ((b2 & 0xC0) == 0) {
+    	switch ((b2 & 0xF8)) {
+          case 0x00 :          // RLC A
+          if ((data & 0x80) == 0x80) {
+          	f = F_CARRY;
+          } else {
+          	f = 0;
+          }
+          data <<= 1;
+          if ((f & F_CARRY) == F_CARRY) {
+          	data |= 1;
+          }
 
-			int bit0 = registers[r1] & 0x1;
-			registers[r1] >>>= 1;
-			registers[r1] |= bit0 << 7;
-			registers[r1] &= 0xFF;
+          data &= 0xFF;
+          if (data == 0) {
+          	f |= F_ZERO;
+          }
+          registerWrite(regNum, data);
+          break;
+          case 0x08 :          // RRC A
+          if ((data & 0x01) == 0x01) {
+          	f = F_CARRY;
+          } else {
+          	f = 0;
+          }
+          data >>= 1;
+          if ((f & F_CARRY) == F_CARRY) {
+          	data |= 0x80;
+          }
+          if (data == 0) {
+          	f |= F_ZERO;
+          }
+          registerWrite(regNum, data);
+          break;
+          case 0x10 :          // RL r
+          
+          if ((data & 0x80) == 0x80) {
+          	newf = F_CARRY;
+          } else {
+          	newf = 0;
+          }
+          data <<= 1;
+          
+          if ((f & F_CARRY) == F_CARRY) {
+          	data |= 1;
+          }
 
-			if (memory.readByte(pc - 1) == 0xCB)
-				checkZeroFlag(r1);
-			else
-				resetFlag(FLAG_ZERO);
+          data &= 0xFF;
+          if (data == 0) {
+          	newf |= F_ZERO;
+          }
+          f = newf;
+          registerWrite(regNum, data);
+          break;
+          case 0x18 :          // RR r
+          if ((data & 0x01) == 0x01) {
+          	newf = F_CARRY;
+          } else {
+          	newf = 0;
+          }
+          data >>= 1;
+          
+          if ((f & F_CARRY) == F_CARRY) {
+          	data |= 0x80;
+          }
+          
+          if (data == 0) {
+          	newf |= F_ZERO;
+          }
+          f = newf;
+          registerWrite(regNum, data);
+          break;
+          case 0x20 :          // SLA r
+          if ((data & 0x80) == 0x80) {
+          	f = F_CARRY;
+          } else {
+          	f = 0;
+          }
 
-			if (bit0 == 1) setFlag(FLAG_CARRY);
-		}
+          data <<= 1;
+          
+          data &= 0xFF;
+          if (data == 0) {
+          	f |= F_ZERO;
+          }
+          registerWrite(regNum, data);
+          break;
+          case 0x28 :          // SRA r
+          short topBit = 0;
 
-		private void rotateRightCarry(int r1) {
-			clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT});
+          topBit = (short) (data & 0x80);
+          if ((data & 0x01) == 0x01) {
+          	f = F_CARRY;
+          } else {
+          	f = 0;
+          }
 
-			int bit0 = registers[r1] & 0x1;
-			registers[r1] >>>= 1;
-			registers[r1] |= getFlag(FLAG_CARRY) << 7;
-			registers[r1] &= 0xFF;
+          data >>= 1;
+          data |= topBit;
 
-			if (memory.readByte(pc - 1) == 0xCB)
-				checkZeroFlag(r1);
-			else
-				resetFlag(FLAG_ZERO);
+          if (data == 0) {
+          	f |= F_ZERO;
+          }
+          registerWrite(regNum, data);
+          break;
+          case 0x30 :          // SWAP r
+          
+          data = (short) (((data & 0x0F) << 4) | ((data & 0xF0) >> 4));
+          if (data == 0) {
+          	f = F_ZERO;
+          } else {
+          	f = 0;
+          }
+//           System.out.println("SWAP - answer is " + JavaBoy.hexByte(data));
+          registerWrite(regNum, data);
+          break;
+          case 0x38 :          // SRL r
+          if ((data & 0x01) == 0x01) {
+          	f = F_CARRY;
+          } else {
+          	f = 0;
+          }
 
-			if (bit0 == 1) 
-				setFlag(FLAG_CARRY);
-			else
-				resetFlag(FLAG_CARRY);
-		}
+          data >>= 1;
 
-		private void rotateRightHL() {
-			clearFlags();
-			int tempByte = readHL();
-			int bit0 = tempByte & 0x1;
-			tempByte >>>= 1;
-			tempByte |= bit0 << 7;
-			tempByte &= 0xFFFF;
+          if (data == 0) {
+          	f |= F_ZERO;
+          }
+          registerWrite(regNum, data);
+          break;
+      }
+  } else {
 
-			writeHL(tempByte);
+  	int bitNumber = (b2 & 0x38) >> 3;
 
-			if (tempByte == 0) setFlag(FLAG_ZERO);
+         if ((b2 & 0xC0) == 0x40)  {  // BIT n, r
+         	mask = (short) (0x01 << bitNumber);
+         	if ((data & mask) != 0) {
+         		f = (short) ((f & F_CARRY) | F_HALFCARRY);
+         	} else {
+         		f = (short) ((f & F_CARRY) | (F_HALFCARRY + F_ZERO));
+         	}
+         }
+         if ((b2 & 0xC0) == 0x80) {  // RES n, r
+         	mask = (short) (0xFF - (0x01 << bitNumber));
+         	data = (short) (data & mask);
+         	registerWrite(regNum, data);
+         }
+         if ((b2 & 0xC0) == 0xC0) {  // SET n, r
+         	mask = (short) (0x01 << bitNumber);
+         	data = (short) (data | mask);
+         	registerWrite(regNum, data);
+         }
 
-			if (bit0 == 1) setFlag(FLAG_CARRY);
-		}
+     }
 
-		private void rotateRightCarryHL() {
-			int flagStat = getFlag(FLAG_CARRY);
-			clearFlags();
-			loadFlag(FLAG_CARRY, flagStat);
+     break;
+    case 0xCC :               // CALL Z, nnnnn
+    if ((f & F_ZERO) == F_ZERO) {
+    	pc += 3;
+    	sp -= 2;
+    	addressWrite(sp + 1, pc >> 8);
+    	addressWrite(sp, pc & 0x00FF);
+    	pc = (b3 << 8) + b2;
+    } else {
+    	pc+=3;
+    }
+    break;
+    case 0xCD :               // CALL nnnn
+    pc += 3;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+    pc = (b3 << 8) + b2;
+    break;
+    case 0xCE :               // ADC A, nn
+    pc+=2;
 
-			int tempByte = readHL();
-			int bit0 = tempByte & 0x1;
-			tempByte >>>= 1;
-			tempByte |= getFlag(FLAG_CARRY) << 7;
-			tempByte &= 0xFFFF;
+    if ((f & F_CARRY) != 0) {
+    	b2++;
+    }
+    f = 0;
 
-			writeHL(tempByte);
+    if ((((a & 0x0F) + (b2 & 0x0F)) & 0xF0) != 0x00) {
+    	f |= F_HALFCARRY;
+    }
 
-			if (tempByte == 0) setFlag(FLAG_ZERO);
+    a += b2;
 
-			if (bit0 == 1)
-				setFlag(FLAG_CARRY);
-			else
-				resetFlag(FLAG_CARRY);
-		}
+        if ((a & 0xFF00) != 0) {     // Perform 8-bit overflow and set zero flag
+        	if (a == 0x0100) {
+        		f |= F_ZERO + F_CARRY + F_HALFCARRY;
+        		a = 0;
+        	} else {
+        		f |= F_CARRY + F_HALFCARRY;
+        		a &= 0x00FF;
+        	}
+        }
+        break;
+    case 0xC7 :               // RST 00
+    pc++;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+//        terminate = true;
+    pc = 0x00;
+    break;
+    case 0xD0 :               // RET NC
+    if ((f & F_CARRY) == 0) {
+    	pc = (JavaBoy.unsign(addressRead(sp + 1)) << 8) + JavaBoy.unsign(addressRead(sp));
+    	sp += 2;
+    } else {
+    	pc++;
+    }
+    break;
+    case 0xD1 :               // POP DE
+    pc++;
+    e = JavaBoy.unsign(addressRead(sp));
+    d = JavaBoy.unsign(addressRead(sp + 1));
+    sp+=2;
+    break;
+    case 0xD2 :               // JP NC, nnnn
+    if ((f & F_CARRY) == 0) {
+    	pc = (b3 << 8) + b2;
+    } else {
+    	pc += 3;
+    }
+    break;
+    case 0xD4 :               // CALL NC, nnnn
+    if ((f & F_CARRY) == 0) {
+    	pc += 3;
+    	sp -= 2;
+    	addressWrite(sp + 1, pc >> 8);
+    	addressWrite(sp, pc & 0x00FF);
+    	pc = (b3 << 8) + b2;
+    } else {
+    	pc+=3;
+    }
+    break;
+    case 0xD5 :               // PUSH DE
+    pc++;
+    sp -= 2;
+    sp &= 0xFFFF;
+    addressWrite(sp, e);
+    addressWrite(sp + 1, d);
+    break;
+    case 0xD6 :               // SUB A, nn
+    pc+=2;
 
-		private int combine(int r1, int r2) {
-			return (registers[r1] << 8) | registers[r2];
-		}
+    f = F_SUBTRACT;
 
-		private void load(int r1, int r2, int value) {
-			value &= 0xFFFF;
-			registers[r1] = value >>> 8;
-			registers[r2] = value & 0xFF;
-		}
+    if ((((a & 0x0F) - (b2 & 0x0F)) & 0xFFF0) != 0x00) {
+    	f |= F_HALFCARRY;
+    }
 
-		private void dec(int r1) {
-			int flagStat = getFlag(FLAG_CARRY);
-			sub(r1, 1);
-			loadFlag(FLAG_CARRY, flagStat);
-		}
+    a -= b2;
+
+    if ((a & 0xFF00) != 0) {
+    	a &= 0x00FF;
+    	f |= F_CARRY;
+    }
+    if (a == 0) {
+    	f |= F_ZERO;
+    }
+    break;
+    case 0xD7 :               // RST 10
+    pc++;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+    pc = 0x10;
+    break;
+    case 0xD8 :               // RET C
+    if ((f & F_CARRY) == F_CARRY) {
+    	pc = (JavaBoy.unsign(addressRead(sp + 1)) << 8) + JavaBoy.unsign(addressRead(sp));
+    	sp += 2;
+    } else {
+    	pc++;
+    }
+    break;
+    case 0xD9 :               // RETI
+    interruptsEnabled = true;
+    inInterrupt = false;
+    pc = (JavaBoy.unsign(addressRead(sp + 1)) << 8) + JavaBoy.unsign(addressRead(sp));
+    sp += 2;
+    break;
+    case 0xDA :               // JP C, nnnn
+    if ((f & F_CARRY) == F_CARRY) {
+    	pc = (b3 << 8) + b2;
+    } else {
+    	pc += 3;
+    }
+    break;
+    case 0xDC :               // CALL C, nnnn
+    if ((f & F_CARRY) == F_CARRY) {
+    	pc += 3;
+    	sp -= 2;
+    	addressWrite(sp + 1, pc >> 8);
+    	addressWrite(sp, pc & 0x00FF);
+    	pc = (b3 << 8) + b2;
+    } else {
+    	pc+=3;
+    }
+    break;
+    case 0xDE :               // SBC A, nn
+    pc+=2;
+    if ((f & F_CARRY) != 0) {
+    	b2++;
+    }
+
+    f = F_SUBTRACT;
+    if ((((a & 0x0F) - (b2 & 0x0F)) & 0xFFF0) != 0x00) {
+    	f |= F_HALFCARRY;
+    }
+
+    a -= b2;
+
+    if ((a & 0xFF00) != 0) {
+    	a &= 0x00FF;
+    	f |= F_CARRY;
+    }
+
+    if (a == 0) {
+    	f |= F_ZERO;
+    }
+    break;
+    case 0xDF :               // RST 18
+    pc++;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+    pc = 0x18;
+    break;
+    case 0xE0 :               // LDH (FFnn), A
+    pc += 2;
+    addressWrite(0xFF00 + b2, a);
+    break;
+    case 0xE1 :               // POP HL
+    pc++;
+    hl = (JavaBoy.unsign(addressRead(sp + 1)) << 8) + JavaBoy.unsign(addressRead(sp));
+    sp += 2;
+    break;
+    case 0xE2 :               // LDH (FF00 + C), A
+    pc++;
+    addressWrite(0xFF00 + c, a);
+    break;
+    case 0xE5 :               // PUSH HL
+    pc++;
+    sp -= 2;
+    sp &= 0xFFFF;
+    addressWrite(sp + 1, hl >> 8);
+    addressWrite(sp, hl & 0x00FF);
+    break;
+    case 0xE6 :               // AND nn
+    pc+=2;
+    a &= b2;
+    if (a == 0) {
+    	f = F_ZERO;
+    } else {
+    	f = 0;
+    }
+    break;
+    case 0xE7 :               // RST 20
+    pc++;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+    pc = 0x20;
+    break;
+    case 0xE8 :               // ADD SP, nn
+    pc+=2;
+    sp = (sp + offset);
+    if ((sp & 0xFFFF0000) != 0) {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)) | (F_CARRY));
+    	sp &= 0xFFFF;
+    } else {
+    	f = (short) ((f & (F_SUBTRACT + F_ZERO + F_HALFCARRY)));
+    }
+    break;
+    case 0xE9 :               // JP (HL)
+    pc++;
+    pc = hl;
+    break;
+    case 0xEA :               // LD (nnnn), A
+    pc += 3;              
+    addressWrite((b3 << 8) + b2, a);
+    break;
+    case 0xEE :               // XOR A, nn
+    pc+=2;
+    a ^= b2;
+    if (a == 0) {
+    	f = F_ZERO;
+    } else {
+    	f = 0;
+    }
+    break;
+    case 0xEF :               // RST 28
+    pc++;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+    pc = 0x28;
+    break;
+    case 0xF0 :               // LDH A, (FFnn)
+    pc += 2;
+    a = JavaBoy.unsign(addressRead(0xFF00 + b2));
+    break;
+    case 0xF1 :               // POP AF
+    pc++;
+    f = JavaBoy.unsign(addressRead(sp));
+    a = JavaBoy.unsign(addressRead(sp + 1));
+    sp+=2;
+    break;
+    case 0xF2 :               // LD A, (FF00 + C)
+    pc++;
+    a = JavaBoy.unsign(addressRead(0xFF00 + c));
+    break;
+    case 0xF3 :               // DI
+    pc++;
+    interruptsEnabled = false;
+    //    addressWrite(0xFFFF, 0);
+    break;
+    case 0xF5 :               // PUSH AF
+    pc++;
+    sp -= 2;
+    sp &= 0xFFFF;
+    addressWrite(sp, f);
+    addressWrite(sp + 1, a);
+    break;
+    case 0xF6 :               // OR A, nn
+    pc+=2;
+    a |= b2;
+    if (a == 0) {
+    	f = F_ZERO;
+    } else {
+    	f = 0;
+    }
+    break;
+    case 0xF7 :               // RST 30
+    pc++;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+    pc = 0x30;
+    break;
+    case 0xF8 :               // LD HL, SP + nn  ** HALFCARRY FLAG NOT SET ***
+    pc += 2;
+    hl = (sp + offset);
+    if ((hl & 0x10000) != 0) {
+    	f = F_CARRY;
+    	hl &= 0xFFFF;
+    } else {
+    	f = 0;
+    }
+    break;
+    case 0xF9 :               // LD SP, HL
+    pc++;
+    sp = hl;
+    break;
+    case 0xFA :               // LD A, (nnnn)
+    pc+=3;
+    a = JavaBoy.unsign(addressRead((b3 << 8) + b2));
+    break;
+    case 0xFB :               // EI
+    pc++;
+    ieDelay = 1;
+      //  interruptsEnabled = true;
+      //  addressWrite(0xFFFF, 0xFF);
+    break;
+    case 0xFE :               // CP nn     ** FLAGS ARE WRONG! **
+    pc += 2;
+    f = 0;
+    if (b2 == a) {
+    	f |= F_ZERO;
+    } else {
+    	if (a < b2) {
+    		f |= F_CARRY;
+    	}
+    }
+    break;
+    case 0xFF :               // RST 38
+    pc++;
+    sp -= 2;
+    addressWrite(sp + 1, pc >> 8);
+    addressWrite(sp, pc & 0x00FF);
+    pc = 0x38;
+    break;
+
+    default :
+
+        if ((b1 & 0xC0) == 0x80) {       // Byte 0x10?????? indicates ALU op
+        	pc++;
+        	int operand = registerRead(b1 & 0x07);
+        	switch ((b1 & 0x38) >> 3) {
+          case 1 : // ADC A, r
+          if ((f & F_CARRY) != 0) {
+          	operand++;
+          }
+              // Note!  No break!
+          case 0 : // ADD A, r
+
+          f = 0;
+
+          if ((((a & 0x0F) + (operand & 0x0F)) & 0xF0) != 0x00) {
+          	f |= F_HALFCARRY;
+          }
+
+          a += operand;
+
+          if (a == 0) {
+          	f |= F_ZERO;
+          }
+
+              if ((a & 0xFF00) != 0) {     // Perform 8-bit overflow and set zero flag
+              	if (a == 0x0100) {
+              		f |= F_ZERO + F_CARRY + F_HALFCARRY;
+              		a = 0;
+              	} else {
+              		f |= F_CARRY + F_HALFCARRY;
+              		a &= 0x00FF;
+              	}
+              }
+              break;
+          case 3 : // SBC A, r
+          if ((f & F_CARRY) != 0) {
+          	operand++;
+          }
+              // Note! No break!
+          case 2 : // SUB A, r
+
+          f = F_SUBTRACT;
+
+          if ((((a & 0x0F) - (operand & 0x0F)) & 0xFFF0) != 0x00) {
+          	f |= F_HALFCARRY;
+          }
+
+          a -= operand;
+
+          if ((a & 0xFF00) != 0) {
+          	a &= 0x00FF;
+          	f |= F_CARRY;
+          }
+          if (a == 0) {
+          	f |= F_ZERO;
+          }
+
+          break;
+          case 4 : // AND A, r
+          a &= operand;
+          if (a == 0) {
+          	f = F_ZERO;
+          } else {
+          	f = 0;
+          }
+          break;
+          case 5 : // XOR A, r
+          a ^= operand;
+          if (a == 0) {
+          	f = F_ZERO;
+          } else {
+          	f = 0;
+          }
+          break;
+          case 6 : // OR A, r
+          a |= operand;
+          if (a == 0) {
+          	f = F_ZERO;
+          } else {
+          	f = 0;
+          }
+          break;
+          case 7 : // CP A, r (compare)
+          f = F_SUBTRACT;
+          if (a == operand) {
+          	f |= F_ZERO;
+          }
+          if (a < operand) {
+          	f |= F_CARRY;
+          }
+          if ((a & 0x0F) < (operand & 0x0F)) {
+          	f |= F_HALFCARRY;
+          }
+          break;
+      }
+        } else if ((b1 & 0xC0) == 0x40) {   // Byte 0x01xxxxxxx indicates 8-bit ld
+
+        	pc++;
+        	registerWrite((b1 & 0x38) >> 3, registerRead(b1 & 0x07));
+
+        } else {
+        	System.out.println("Unrecognized opcode (" + JavaBoy.hexByte(b1) + ")");
+        	terminate = true;
+        	pc++;
+        	break;
+        }
+    }
+
+    private int readHL() {
+    	return memory.readByte(combine(REGISTER_H, REGISTER_L));
+    }
+
+    private void writeHL(int data) {
+    	memory.writeByte(combine(REGISTER_H, REGISTER_L), data & 0xFFFF);
+    }
+
+    private void compare(int r1, int data) {
+    	clearFlags();
+    	setFlag(FLAG_SUBTRACT);
+
+    	if (data > registers[r1])
+    		setFlag(FLAG_CARRY);
+    	else if (registers[r1] == data)
+    		setFlag(FLAG_ZERO);
+
+    	if ((data & 0x0F) > (registers[r1] & 0x0F))
+    		setFlag(FLAG_HALFCARRY);
+    }
+
+    private void checkZeroFlag(int r1) {
+    	if (registers[r1] == 0) setFlag(FLAG_ZERO);
+    	else resetFlag(FLAG_ZERO);
+    }
+
+    private void setFlag(int flag) {
+    	registers[REGISTER_F] |= flag;
+    }
+
+    private void resetFlag(int flag) {
+    	registers[REGISTER_F] &= (~(flag)) & 0xFF;
+    }
+
+    private void invertFlag(int flag) {
+    	if (getFlag(flag) == 1) resetFlag(flag);
+    	else setFlag(flag);
+    }
+
+    public int getFlag(int flag) {
+    	int flagVal = 0;
+    	int flagReg = (registers[REGISTER_F] & flag);
+    	switch (flag) {
+    		case FLAG_ZERO:
+    		flagVal = flagReg >>> 7;
+    		break;
+    		case FLAG_SUBTRACT:
+    		flagVal = flagReg >>> 6;
+    		break;
+    		case FLAG_HALFCARRY:
+    		flagVal = flagReg >>> 5;
+    		break;
+    		case FLAG_CARRY:
+    		flagVal = flagReg >>> 4;
+    		break;
+    	}
+    	return flagVal;
+    }
+
+    private void loadFlag(int flag, int data) {
+    	if (data == 1) setFlag(flag);
+    	else resetFlag(flag);
+    }
+
+    private void clearFlags() {
+    	registers[REGISTER_F] = 0;
+    }
+
+    private void clearFlags(int[] flagArr) {
+    	for(int num : flagArr)
+    		resetFlag(num);
+    }
+
+    private void rotateLeft(int r1) {
+    	clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT, FLAG_CARRY});
+
+    	int bit7 = registers[r1] >>> 7;
+    	registers[r1] <<= 1;
+    	registers[r1] |= bit7;
+    	registers[r1] &= 0xFF;
+
+    	if (memory.readByte(pc - 1) == 0xCB)
+    		checkZeroFlag(r1);
+    	else
+    		resetFlag(FLAG_ZERO);
+
+    	if (bit7 == 1) setFlag(FLAG_CARRY);
+    }
+
+    private void rotateLeftHL() {
+    	clearFlags();
+    	int tempByte = readHL();
+    	int bit7 = tempByte >>> 7;
+    	tempByte <<= 1;
+    	tempByte |= bit7;
+    	tempByte &= 0xFFFF;
+
+    	writeHL(tempByte);
+
+    	if (tempByte == 0) setFlag(FLAG_ZERO);
+
+    	if (bit7 == 1) setFlag(FLAG_CARRY);
+    }
+
+    private void rotateLeftCarry(int r1) {
+    	clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT});
+
+    	int bit7 = (registers[r1] >>> 7) & 0x1;
+    	registers[r1] <<= 1;
+    	registers[r1] |= getFlag(FLAG_CARRY);
+    	registers[r1] &= 0xFF;
+
+    	if (memory.readByte(pc - 1) == 0xCB)
+    		checkZeroFlag(r1);
+    	else
+    		resetFlag(FLAG_ZERO);
+
+    	if (bit7 == 1)
+    		setFlag(FLAG_CARRY);
+    	else
+    		resetFlag(FLAG_CARRY);
+    }
+
+    private void rotateLeftCarryHL() {
+    	int flagStat = getFlag(FLAG_CARRY);
+    	clearFlags();
+    	loadFlag(FLAG_CARRY, flagStat);
+
+    	int tempByte = readHL();
+    	int bit7 = tempByte >>> 7;
+    	tempByte <<= 1;
+    	tempByte |= getFlag(FLAG_CARRY);
+    	tempByte &= 0xFFFF;
+
+    	writeHL(tempByte);
+
+    	if (tempByte == 0) setFlag(FLAG_ZERO);
+
+    	if (bit7 == 1) 
+    		setFlag(FLAG_CARRY);
+    	else
+    		resetFlag(FLAG_CARRY);
+    }
+
+    private void rotateRight(int r1) {
+    	clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT, FLAG_CARRY});
+
+    	int bit0 = registers[r1] & 0x1;
+    	registers[r1] >>>= 1;
+    	registers[r1] |= bit0 << 7;
+    	registers[r1] &= 0xFF;
+
+    	if (memory.readByte(pc - 1) == 0xCB)
+    		checkZeroFlag(r1);
+    	else
+    		resetFlag(FLAG_ZERO);
+
+    	if (bit0 == 1) setFlag(FLAG_CARRY);
+    }
+
+    private void rotateRightCarry(int r1) {
+    	clearFlags(new int[]{FLAG_HALFCARRY, FLAG_SUBTRACT});
+
+    	int bit0 = registers[r1] & 0x1;
+    	registers[r1] >>>= 1;
+    	registers[r1] |= getFlag(FLAG_CARRY) << 7;
+    	registers[r1] &= 0xFF;
+
+    	if (memory.readByte(pc - 1) == 0xCB)
+    		checkZeroFlag(r1);
+    	else
+    		resetFlag(FLAG_ZERO);
+
+    	if (bit0 == 1) 
+    		setFlag(FLAG_CARRY);
+    	else
+    		resetFlag(FLAG_CARRY);
+    }
+
+    private void rotateRightHL() {
+    	clearFlags();
+    	int tempByte = readHL();
+    	int bit0 = tempByte & 0x1;
+    	tempByte >>>= 1;
+    	tempByte |= bit0 << 7;
+    	tempByte &= 0xFFFF;
+
+    	writeHL(tempByte);
+
+    	if (tempByte == 0) setFlag(FLAG_ZERO);
+
+    	if (bit0 == 1) setFlag(FLAG_CARRY);
+    }
+
+    private void rotateRightCarryHL() {
+    	int flagStat = getFlag(FLAG_CARRY);
+    	clearFlags();
+    	loadFlag(FLAG_CARRY, flagStat);
+
+    	int tempByte = readHL();
+    	int bit0 = tempByte & 0x1;
+    	tempByte >>>= 1;
+    	tempByte |= getFlag(FLAG_CARRY) << 7;
+    	tempByte &= 0xFFFF;
+
+    	writeHL(tempByte);
+
+    	if (tempByte == 0) setFlag(FLAG_ZERO);
+
+    	if (bit0 == 1)
+    		setFlag(FLAG_CARRY);
+    	else
+    		resetFlag(FLAG_CARRY);
+    }
+
+    private int combine(int r1, int r2) {
+    	return (registers[r1] << 8) | registers[r2];
+    }
+
+    private void load(int r1, int r2, int value) {
+    	value &= 0xFFFF;
+    	registers[r1] = value >>> 8;
+    	registers[r2] = value & 0xFF;
+    }
+
+    private void dec(int r1) {
+    	int flagStat = getFlag(FLAG_CARRY);
+    	sub(r1, 1);
+    	loadFlag(FLAG_CARRY, flagStat);
+    }
 
 		/*** 
 		DEC for 16bit register pairs. NO FLAGS SET.
