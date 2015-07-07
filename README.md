@@ -15,7 +15,7 @@ Glenn-Mac:src Glenn-Mac$ java jBoy <romfile>
 ```
 ## To-Do ##
 
-Finish OPcodes and ALL other emulator components...
+Find bug that is stopping the rendering of the background once the nintendo logo has scrolled down.
 
 ## Copyright and License ##
 
