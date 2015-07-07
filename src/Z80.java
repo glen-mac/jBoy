@@ -40,6 +40,8 @@ public class Z80 {
 	public static final int INTERUPT_ENABLED_REG = 0xFFFF;
 	private boolean interuptMasterEnable = true;
 
+	public static final int JOYPAD_REG = 0xFF00;
+
 
 	MMU memory;
 	GPU graphics;
@@ -62,29 +64,33 @@ public class Z80 {
 	public void playCartridge() {
 		Scanner sc = new Scanner(System.in);
 		boolean step = false;
-		while (!doReset){
-			if (!halted){
+		try {
+			while (!doReset){
+				if (!halted){
 				/*if (pc ==0x3b8)
 					step =true;
 				if (step)
-					while (!(sc.nextLine().trim().isEmpty())){}*/
-				opCode = memory.readByte(pc++);
+				while (!(sc.nextLine().trim().isEmpty())){}*/
+					opCode = memory.readByte(pc++);
 				numCycles = execute(opCode);
 				updateTimers(numCycles);
 				graphics.updateGraphics(numCycles);
 				checkInterupts();
 			}
 		}
+	} catch (RuntimeException e) {
+		throw new RuntimeException(String.format("PC: %4x", pc), e);
 	}
+}
 
-	private boolean isClockEnabled() {
-		boolean result = false;
-		if (((memory.readByte(TIMER_CONTR) >>> 2) & 0x1) == 1) result = true;
-		return result;
-	}
+private boolean isClockEnabled() {
+	boolean result = false;
+	if (((memory.readByte(TIMER_CONTR) >>> 2) & 0x1) == 1) result = true;
+	return result;
+}
 
-	public void setClockFreq() {
-		switch (getClockFreq()) {
+public void setClockFreq() {
+	switch (getClockFreq()) {
 			case 0: timerCounter = 1024;	break; // freq 4096
 			case 1: timerCounter = 16;		break; // freq 262144
 			case 2:timerCounter = 64;		break; // freq 65536
@@ -2704,7 +2710,7 @@ public class Z80 {
 					if(registers[REGISTER_A] == 0)
 						setFlag(FLAG_ZERO);
 					else
-						resetFlag(FLAG_ZERO);*/
+					resetFlag(FLAG_ZERO);*/
 
 
 					return 4;
@@ -2799,42 +2805,42 @@ public class Z80 {
 				}
 				case 0xC7:
 				{ //RST $00
-					restartOP();
+					restartOP(0);
 					return 32;
 				}
 				case 0xCF:
 				{ //RST $08
-					restartOP();
+					restartOP(0x08);
 					return 32;
 				}
 				case 0xD7:
 				{ //RST $10
-					restartOP();
+					restartOP(0x10);
 					return 32;
 				}
 				case 0xDF:
 				{ //RST $18
-					restartOP();
+					restartOP(0x18);
 					return 32;
 				}
 				case 0xE7:
 				{ //RST $20
-					restartOP();
+					restartOP(0x20);
 					return 32;
 				}
 				case 0xEF:
 				{ //RST $28
-					restartOP();
+					restartOP(0x28);
 					return 32;
 				}
 				case 0xF7:
 				{ //RST $30
-					restartOP();
+					restartOP(0x30);
 					return 32;
 				}
 				case 0xFF:
 				{ //RST $38
-					restartOP();
+					restartOP(0x38);
 					return 32;
 				}
 				case 0xC3:
@@ -3499,10 +3505,10 @@ public class Z80 {
 			}
 		}
 
-		private void restartOP() {
+		private void restartOP(int index) {
 			push(pc >>> 8);
 			push(pc & 0xFF);
-			pc = memory.readByte(pc);
+			pc = index & 0xFF;
 		}
 
 		private void returnOP() {
