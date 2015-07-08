@@ -140,6 +140,8 @@ public void setClockFreq() {
 		//0x0100;
 		memory.reset();
 
+		memory.writeByte(JOYPAD_REG, 0xCF); // JOYPAD
+		memory.writeByte(GPU.LCD_STATUS, 0x80); // LCD STAT
 		memory.writeByte(0xFF05, 0x00); // TIMA
 		memory.writeByte(0xFF06, 0x00); // TMA
 		memory.writeByte(0xFF07, 0x00); // TAC

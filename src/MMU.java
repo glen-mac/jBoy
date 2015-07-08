@@ -197,8 +197,8 @@ public class MMU{
 			//System.out.println("unmapped bios");
 			return;
 		} else if (addr == cpu.JOYPAD_REG){
-			if ((data & 0xCF) != 0)
-				return;
+			portsIO[cpu.JOYPAD_REG - 0xFF00] = (short) ((portsIO[cpu.JOYPAD_REG - 0xFF00] & 0xCF) | (data & 0x30));
+			return;
 		}
 
 
