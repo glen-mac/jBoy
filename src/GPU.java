@@ -62,14 +62,14 @@ public class GPU {
 
 		int status = cpu.memory.readByte(LCD_STATUS);
 
-		//System.out.println("GPU MODE = " + _LCDmode);
+		System.out.println("GPU MODE = " + _LCDmode);
 
 		if (isLCDEnabled()) {
 			_modeClock += cycles;
-			//System.out.println("LCD ENABLED");
+			System.out.println("LCD ENABLED");
 		}
 		else {
-			//System.out.println("LCD DISABLED");
+			System.out.println("LCD DISABLED");
 			status = cpu.bitSet(status & 0xFC, 0); //1111 1101
 			_LCDmode = 1;
 			_modeClock = 0;
@@ -78,9 +78,9 @@ public class GPU {
 			return;
 		}
 
-		//System.out.println("MODECLOCK = " + _modeClock);
-		//System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] + " (0x"+Integer.toHexString(cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]).toUpperCase()+")");
-		//System.out.println("ZERO FLAG = " + cpu.getFlag(cpu.FLAG_ZERO));
+		System.out.println("MODECLOCK = " + _modeClock);
+		System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00] + " (0x"+Integer.toHexString(cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]).toUpperCase()+")");
+		System.out.println("ZERO FLAG = " + cpu.getFlag(cpu.FLAG_ZERO));
 
 		switch (_LCDmode) {
 
@@ -114,7 +114,7 @@ public class GPU {
 			if (_modeClock >= 456) {					//required clock cycles for full H-blank cycle (used for invisible scanlines)
 				_modeClock = 0;							//reset the clock
 				incScanLine();							//increment line number
-				//System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
+				System.out.println("LINE (scaline) = " + (int) cpu.memory.portsIO[SCANLINE_NUM - 0xFF00]);
 				if (getScanLine() == 153) { 			//reached full frame (including invisible lines)
 					resetScanLine();					//reset scan line number
 					_LCDmode = 2;						//set mode as access OAM mode

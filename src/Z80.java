@@ -107,7 +107,7 @@ public void setClockFreq() {
 		if (divideCounter >= 255) { //freq is 16382 Hz
 			divideCounter = 0;
 			memory.portsIO[DIVIDE_REG - 0xFF00]++;
-			//System.out.println("dividecounter = " + divideCounter);
+			System.out.println("dividecounter = " + divideCounter);
 		}
 	}
 
@@ -115,7 +115,7 @@ public void setClockFreq() {
 		updateDivideRegister(cycles);
 		if (isClockEnabled()) {
 			timerCounter -= cycles;
-			//System.out.println("timercounter = " + timerCounter);
+			System.out.println("timercounter = " + timerCounter);
 			if (timerCounter <= 0) {
 				setClockFreq();
 				if (memory.readByte(TIMER_REG) == 255) {
@@ -188,22 +188,22 @@ public void setClockFreq() {
 			}
 			fis.close(); //close the file
 
-			//System.out.println("finished cart");
+			System.out.println("finished cart");
 		} catch (FileNotFoundException ex) {
-			//System.out.println("ERROR: File '" + fileName + "' not found!\n");
+			System.out.println("ERROR: File '" + fileName + "' not found!\n");
 			System.exit(0);
 		} catch (IOException ex) {
-			//System.out.println("ERROR: An I/O exception of some sort has occurred!\n");
+			System.out.println("ERROR: An I/O exception of some sort has occurred!\n");
 			System.exit(0);
 		} catch (Exception ex) {
-			//System.out.println("ERROR: An exception of some sort has occurred!\n");
+			System.out.println("ERROR: An exception of some sort has occurred!\n");
 			System.exit(0);
 		}
 	}
 
 	public void requestInterupt(int bitNum){
 		memory.writeByte(INTERUPT_REQUEST_REG, bitSet(memory.readByte(INTERUPT_REQUEST_REG), bitNum));
-		//System.out.println("INTERRUPT " + bitNum);
+		System.out.println("INTERRUPT " + bitNum);
 	}
 
 	private void checkInterupts(){
@@ -237,7 +237,7 @@ public void setClockFreq() {
 			}
 		}
 
-		//System.out.println("Serving interrupt: " + bitNum);
+		System.out.println("Serving interrupt: " + bitNum);
 	}
 
 	public static int bitSet(int num, int bit){
@@ -276,7 +276,7 @@ public void setClockFreq() {
 	}
 
 	public int execute(int opCode) {
-		//System.out.println("PC = 0x" + Integer.toHexString(pc - 1) + " | Performing OPCode 0x"+Integer.toHexString(opCode).toUpperCase());
+		System.out.println("PC = 0x" + Integer.toHexString(pc - 1) + " | Performing OPCode 0x"+Integer.toHexString(opCode).toUpperCase());
 		int tempByte;
 
 		switch (opCode) {
@@ -1370,7 +1370,7 @@ public void setClockFreq() {
 				}
 				case 0xCB:
 				{ //SWAP n | RLC n | RL n
-					//System.out.println("PC = 0x" + Integer.toHexString(pc) + " | Performing Sub-OPCode 0x"+Integer.toHexString(memory.readByte(pc)).toUpperCase());
+					System.out.println("PC = 0x" + Integer.toHexString(pc) + " | Performing Sub-OPCode 0x"+Integer.toHexString(memory.readByte(pc)).toUpperCase());
 					switch (memory.readByte(pc++)) {
 						case 0x37:
 							{ //SWAP A
