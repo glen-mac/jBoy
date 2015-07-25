@@ -15,7 +15,7 @@ Glenn-Mac:src Glenn-Mac$ java jBoy <romfile>
 ```
 ## To-Do ##
 
-Find bug that is stopping the rendering of the background once the nintendo logo has scrolled down.
+Finalize Sprites, keyboard joypad input, sounds, and current hanging bug.
 
 ## Copyright and License ##
 
@@ -23,4 +23,5 @@ This is free software, licensed under the MIT license.
 
 ## Thanks ##
 
-Thanks to all the detailed resources out there covering this old but gold system!
+Thanks to all the detailed resources out there covering this old but gold system! 
+Also a huge thanks to gekkio for all the assistance debugging many issues!
