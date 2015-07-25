@@ -9,16 +9,16 @@ public class GPU {
 	Bits 7-6 maps to colour id 11, bits 5-4 map to colour id 10, 
 	bits 3-2 map to colour id 01 and bits 1-0 map to colour id 00.*/
 	/* 0  White
- 1  Light gray
- 2  Dark gray
- 3  Black*/
- public static final int CLR_PLT_BKG = 0xFF47;
- public static final int CLR_PLT_SPRT_1 = 0xFF48;
- public static final int CLR_PLT_SPRT_2 = 0xFF49;
+        1  Light gray
+        2  Dark gray
+        3  Black*/
+        public static final int CLR_PLT_BKG = 0xFF47;
+        public static final int CLR_PLT_SPRT_1 = 0xFF48;
+        public static final int CLR_PLT_SPRT_2 = 0xFF49;
 
- public static final int SCROLL_Y = 0xFF42;
- public static final int SCROLL_X = 0xFF43;
- public static final int WINDOW_Y = 0xFF4A;
+        public static final int SCROLL_Y = 0xFF42;
+        public static final int SCROLL_X = 0xFF43;
+        public static final int WINDOW_Y = 0xFF4A;
 	public static final int WINDOW_X = 0xFF4B; // true value is this - 7
 
 	public static final int SCANLINE_NUM = 0xFF44;

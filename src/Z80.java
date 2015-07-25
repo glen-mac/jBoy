@@ -139,7 +139,6 @@ public void setClockFreq() {
 		pc = 0x0;
 		//0x0100;
 		memory.reset();
-
 		memory.portsIO[JOYPAD_REG - 0xFF00] = 0xCF; // JOYPAD
 		memory.writeByte(GPU.LCD_STATUS, 0x80); // LCD STAT
 		memory.writeByte(0xFF05, 0x00); // TIMA

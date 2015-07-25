@@ -34,6 +34,7 @@ public class MMU{
 	private int _MBC1mode = 0; //0=16/8, 1=4/32
 	private boolean _ramStatus = false;
 	public boolean _inBIOS = true;
+	private int _joypadState = 0xFF;
 
 	private Z80 cpu;
 
@@ -70,6 +71,10 @@ public class MMU{
 	public int readByte(int addr){
 		addr &= 0xFFFF;
 		System.out.print("PC = 0x" + Integer.toHexString(cpu.pc - 1) + " | Reading address 0x"+Integer.toHexString(addr).toUpperCase() + " | Returned 0x");
+		
+		if (addr == cpu.JOYPAD_REG)
+                    return getJoyPad();
+		
 		switch (addr & 0xF000) {
 			//ROM bank 0 (16 kB)
 			case 0x0000:
@@ -349,6 +354,12 @@ public class MMU{
 
 		for(int i = 0; i < 0xA0; i++)
 			writeByte(0xFE00 + i, readByte(address + i));
+	}
+	
+	private int getJoyPad(){
+            short joyP = portsIO[0];
+            int shift = (cpu.bitGet(joyP, 5) == 1) ? 4 : 0;
+            return (_joypadState >>> shift) & 0xF;
 	}
 
 } //end class
