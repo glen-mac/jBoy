@@ -516,7 +516,7 @@ public void setClockFreq() {
     	newf = 0;
     }
     a <<= 1;
-    
+
     if ((f & F_CARRY) == F_CARRY) {
     	a |= 1;
     }
@@ -599,11 +599,11 @@ public void setClockFreq() {
     	newf = 0;
     }
     a >>= 1;
-    
+
     if ((f & F_CARRY) == F_CARRY) {
     	a |= 0x80;
     }
-    
+
     if (a == 0) {
     	newf |= F_ZERO;
     }
@@ -1129,7 +1129,7 @@ break;
           registerWrite(regNum, data);
           break;
           case 0x10 :          // RL r
-          
+
           if ((data & 0x80) == 0x80) {
           	newf = F_CARRY;
           } else {
@@ -1155,11 +1155,11 @@ break;
           	newf = 0;
           }
           data >>= 1;
-          
+
           if ((f & F_CARRY) == F_CARRY) {
           	data |= 0x80;
           }
-          
+
           if (data == 0) {
           	newf |= F_ZERO;
           }
@@ -1174,7 +1174,7 @@ break;
           }
 
           data <<= 1;
-          
+
           data &= 0xFF;
           if (data == 0) {
           	f |= F_ZERO;
@@ -1200,7 +1200,7 @@ break;
           registerWrite(regNum, data);
           break;
           case 0x30 :          // SWAP r
-          
+
           data = (short) (((data & 0x0F) << 4) | ((data & 0xF0) >> 4));
           if (data == 0) {
           	f = F_ZERO;
@@ -1690,6 +1690,7 @@ break;
         	break;
         }
     }
+}
 
     private int readHL() {
     	return memory.readByte(combine(REGISTER_H, REGISTER_L));
